@@ -133,7 +133,7 @@
     }
 
     /* ── TABLE ── */
-    /* columns: categoria | detalhamento | meta | pix | crédito | total | diferença | % | del */
+    /* columns: categoria | subcategoria | meta | pix | crédito | total | diferença | % | del */
     .tbl-head {
       display: grid;
       grid-template-columns: 195px 1fr 108px 105px 110px 115px 95px 55px 38px;
@@ -742,7 +742,7 @@
     <div class="table-wrap">
       <div class="tbl-head">
         <span>Categoria</span>
-        <span>Detalhamento</span>
+        <span>Subcategoria</span>
         <span class="r">Meta (R$)</span>
         <span class="r">PIX / TED</span>
         <span class="r">Crédito</span>
@@ -805,7 +805,7 @@
             <select id="efCategoria" class="ef-input" onchange="onEfCategoriaChange()"></select>
           </div>
           <div class="ef-field" style="min-width:155px">
-            <label>Detalhamento</label>
+            <label>Subcategoria</label>
             <input type="text" id="efDet" class="ef-input" list="efDetList" placeholder="Ex: Combustível">
             <datalist id="efDetList"></datalist>
           </div>
@@ -864,7 +864,7 @@
         <span>Data</span>
         <span>Competência</span>
         <span>Categoria</span>
-        <span>Detalhamento</span>
+        <span>Subcategoria</span>
         <span>Descrição</span>
         <span class="r">Valor</span>
         <span class="c">Tipo</span>
@@ -927,7 +927,7 @@
             <tr><th>Coluna</th><th>Nome</th><th>Exemplo</th></tr>
             <tr><td>A</td><td>Data</td><td class="col-ex">15/05/2026</td></tr>
             <tr><td>B</td><td>Categoria</td><td class="col-ex">Carro</td></tr>
-            <tr><td>C</td><td>Detalhamento</td><td class="col-ex">Combustível</td></tr>
+            <tr><td>C</td><td>Subcategoria</td><td class="col-ex">Combustível</td></tr>
             <tr><td>D</td><td>Descrição</td><td class="col-ex">Posto Shell</td></tr>
             <tr><td>E</td><td>Valor</td><td class="col-ex">250</td></tr>
             <tr><td>F</td><td>Pagamento</td><td class="col-ex">Cartão ou PIX</td></tr>
