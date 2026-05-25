@@ -1248,11 +1248,9 @@ function renderTable() {
     cRow.className = 'cat-row';
     cRow.onclick = () => toggleCat(cat.id);
 
-    const nameCell = isDefCat
-      ? `<span>${esc(cat.name)}</span>`
-      : `<input class="cat-name-input" value="${esc(cat.name)}"
-           oninput="setCatName('${cat.id}',this.value)"
-           onblur="saveData()" onclick="event.stopPropagation()">`;
+    const nameCell = `<input class="cat-name-input" value="${esc(cat.name)}"
+         oninput="setCatName('${cat.id}',this.value)"
+         onblur="saveData()" onclick="event.stopPropagation()">`;
 
     const delCatBtn = `<button class="btn-del" style="margin-left:auto"
          onclick="deleteCat('${cat.id}',event)" title="Remover categoria">🗑</button>`;
