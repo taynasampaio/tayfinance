@@ -353,6 +353,12 @@
       }
     }
 
+    @media (max-width: 768px) {
+      .tbl-head, .cat-row, .det-row, .btn-add-row, .btn-new-cat {
+        grid-template-columns: 120px 140px 82px 78px 82px 82px 70px 40px 28px;
+      }
+    }
+
     /* ── MOBILE (≤768px) ── */
     @media (max-width: 768px) {
       /* Header: row1 = logo + month-nav, row2 = tabs + actions */
@@ -387,9 +393,9 @@
       .recon-field { flex: 1 1 calc(50% - 6px); }
 
       /* Budget table: horizontal scroll */
-      .table-wrap { overflow-x: auto; }
-      .tbl-head { min-width: 680px; }
-      .cat-row, .det-row, .btn-add-row, .btn-new-cat { min-width: 680px; }
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tbl-head { min-width: 780px; }
+      .cat-row, .det-row, .btn-add-row, .btn-new-cat { min-width: 780px; }
 
       /* Extrato table: horizontal scroll */
       .extrato-table-wrap { overflow-x: auto; }
