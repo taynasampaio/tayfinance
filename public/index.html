@@ -933,7 +933,7 @@
             <tr><td>F</td><td>Pagamento</td><td class="col-ex">Cartão ou PIX</td></tr>
             <tr><td>G</td><td>Parcelas</td><td class="col-ex">3 (deixe 1 para à vista)</td></tr>
           </table>
-          <div class="step-desc" style="margin-top:8px">Categorias aceitas: <em>Moradia, Mercado, Delivery, Restaurante / Bar / Rolê, Uber, Carro, Saúde, Lazer, Educação, Vestuário, Pessoal, Finanças, Outros</em></div>
+          <div class="step-desc" style="margin-top:8px">Categorias aceitas: <em>Moradia, Mercado, Delivery, Uber, Carro, Saúde, Lazer, Educação, Vestuário, Pessoal, Finanças, Outros</em></div>
         </div>
       </div>
 
@@ -999,19 +999,18 @@ const CLOUD_SECRET = 'Taysampaio321@';
 const EXTRA_COLORS = ['#e11d48','#0891b2','#7c3aed','#b45309','#065f46','#be185d','#4d7c0f','#1d4ed8','#9f1239','#0e7490'];
 
 const CAT_COLORS = {
-  moradia:     '#6366f1',
-  mercado:     '#22c55e',
-  delivery:    '#f97316',
-  restaurante: '#ec4899',
-  uber:        '#334155',
-  carro:       '#78716c',
-  saude:       '#06b6d4',
-  lazer:       '#a855f7',
-  educacao:    '#3b82f6',
-  vestuario:   '#f43f5e',
-  pessoal:     '#84cc16',
-  financas:    '#eab308',
-  outros:      '#94a3b8',
+  moradia:   '#6366f1',
+  mercado:   '#22c55e',
+  delivery:  '#f97316',
+  uber:      '#334155',
+  carro:     '#78716c',
+  saude:     '#06b6d4',
+  lazer:     '#a855f7',
+  educacao:  '#3b82f6',
+  vestuario: '#f43f5e',
+  pessoal:   '#84cc16',
+  financas:  '#eab308',
+  outros:    '#94a3b8',
 };
 
 // ─── DEFAULT CATEGORY STRUCTURE ─────────────────────────────────────────────
@@ -1029,9 +1028,6 @@ const DEFAULT_CATS = [
   ]},
   { id: 'delivery',    name: 'Delivery',                 items: [
     { id: 'de1', det: 'Delivery',           meta: 0, realPix: 0, realCard: 0, isDef: true },
-  ]},
-  { id: 'restaurante', name: 'Restaurante / Bar / Rolê', items: [
-    { id: 're1', det: 'Restaurante / Bar / Rolê', meta: 0, realPix: 0, realCard: 0, isDef: true },
   ]},
   { id: 'uber',        name: 'Uber',                     items: [
     { id: 'ub1', det: 'Uber',               meta: 0, realPix: 0, realCard: 0, isDef: true },
@@ -1258,10 +1254,8 @@ function renderTable() {
            oninput="setCatName('${cat.id}',this.value)"
            onblur="saveData()" onclick="event.stopPropagation()">`;
 
-    const delCatBtn = !isDefCat
-      ? `<button class="btn-del" style="margin-left:auto"
-           onclick="deleteCat('${cat.id}',event)" title="Remover categoria">🗑</button>`
-      : '<div></div>';
+    const delCatBtn = `<button class="btn-del" style="margin-left:auto"
+         onclick="deleteCat('${cat.id}',event)" title="Remover categoria">🗑</button>`;
 
     cRow.draggable = true;
     cRow.dataset.catId = cat.id;
@@ -1397,9 +1391,7 @@ function renderTable() {
               </div>` : '<span style="color:#cbd5e1;font-size:11px">—</span>'}
           </div>
           <div>
-            ${!item.isDef
-              ? `<button class="btn-del" onclick="delItem('${cat.id}','${item.id}',event)" title="Remover">✕</button>`
-              : '<div style="width:34px"></div>'}
+            <button class="btn-del" onclick="delItem('${cat.id}','${item.id}',event)" title="Remover">✕</button>
           </div>
         `;
       }
@@ -2085,19 +2077,18 @@ const APPS_SCRIPT_CODE = `// ═════════════════
 // ═══════════════════════════════════════════════════════
 
 const CATEGORIA_ID = {
-  'Moradia':                  'moradia',
-  'Mercado':                  'mercado',
-  'Delivery':                 'delivery',
-  'Restaurante / Bar / Rolê': 'restaurante',
-  'Uber':                     'uber',
-  'Carro':                    'carro',
-  'Saúde':                    'saude',
-  'Lazer':                    'lazer',
-  'Educação':                 'educacao',
-  'Vestuário':                'vestuario',
-  'Pessoal':                  'pessoal',
-  'Finanças':                 'financas',
-  'Outros':                   'outros',
+  'Moradia':   'moradia',
+  'Mercado':   'mercado',
+  'Delivery':  'delivery',
+  'Uber':      'uber',
+  'Carro':     'carro',
+  'Saúde':     'saude',
+  'Lazer':     'lazer',
+  'Educação':  'educacao',
+  'Vestuário': 'vestuario',
+  'Pessoal':   'pessoal',
+  'Finanças':  'financas',
+  'Outros':    'outros',
 };
 
 function doGet() {
@@ -2146,7 +2137,7 @@ function resp(data) {
 }`;
 
 const SHEET_CAT_IDS = new Set([
-  'moradia','mercado','delivery','restaurante','uber','carro',
+  'moradia','mercado','delivery','uber','carro',
   'saude','lazer','educacao','vestuario','pessoal','financas','outros',
 ]);
 
