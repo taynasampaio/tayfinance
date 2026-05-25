@@ -886,7 +886,7 @@
       </div>
 
       <div class="chart-card">
-        <div class="chart-title">Maiores Gastos &amp; Oportunidades</div>
+        <div class="chart-title">Top 10 Subcategorias</div>
         <ul class="opp-list" id="oppList"></ul>
       </div>
 
@@ -1545,8 +1545,27 @@ function renderDashboard() {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 11, padding: 10 } },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)}` } },
+        legend: {
+          position: 'right',
+          labels: {
+            font: { family: 'Inter', size: 11 }, boxWidth: 11, padding: 10,
+            generateLabels: chart => {
+              const ds = chart.data.datasets[0];
+              const total = ds.data.reduce((a, b) => a + b, 0);
+              return chart.data.labels.map((label, i) => ({
+                text: `${label}  ${total > 0 ? Math.round(ds.data[i] / total * 100) : 0}%`,
+                fillStyle: ds.backgroundColor[i],
+                strokeStyle: ds.backgroundColor[i],
+                lineWidth: 0, hidden: false, index: i,
+              }));
+            },
+          },
+        },
+        tooltip: { callbacks: { label: ctx => {
+          const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+          const pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+          return ` ${ctx.label}: ${fmt(ctx.parsed)} (${pct}%)`;
+        }}},
       },
     },
   });
@@ -1601,40 +1620,37 @@ function renderDashboard() {
   const list = document.getElementById('oppList');
   list.innerHTML = '';
 
-  const ranked = cats.map((cat, i) => ({
-    name: cat.name, color: clrs[i],
-    meta: metas[i], real: reals[i],
-    pct: metas[i] > 0 ? reals[i] / metas[i] * 100 : (reals[i] > 0 ? Infinity : 0),
-  })).filter(x => x.real > 0).sort((a, b) => {
-    const aO = a.pct > 100, bO = b.pct > 100;
-    if (aO && !bO) return -1; if (!aO && bO) return 1;
-    if (aO && bO)  return (b.real - b.meta) - (a.real - a.meta);
-    return b.real - a.real;
+  const allSubs = [];
+  cats.forEach((cat, ci) => {
+    cat.items.forEach(item => {
+      if (item.isRecon) return;
+      const val = iReal(item);
+      if (val <= 0) return;
+      allSubs.push({ catName: cat.name, catColor: clrs[ci], subName: item.det, val });
+    });
   });
 
-  if (!ranked.length) {
+  const totalSpent = allSubs.reduce((s, x) => s + x.val, 0);
+  allSubs.sort((a, b) => b.val - a.val);
+
+  if (!allSubs.length) {
     list.innerHTML = '<li style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">Nenhum gasto registrado ainda</li>';
     return;
   }
 
-  ranked.slice(0, 9).forEach(x => {
-    let txt, cls;
-    if (x.pct === Infinity)  { txt = 'Sem meta definida';           cls = 'badge-gray';  }
-    else if (x.pct > 100)    { txt = `+${fmt(x.real-x.meta)} acima`; cls = 'badge-red'; }
-    else if (x.pct > 80)     { txt = `${Math.round(x.pct)}% usado`; cls = 'badge-amber'; }
-    else                     { txt = `${Math.round(x.pct)}% usado`; cls = 'badge-green'; }
-
+  allSubs.slice(0, 10).forEach(x => {
+    const pct = totalSpent > 0 ? Math.round(x.val / totalSpent * 100) : 0;
     const li = document.createElement('li');
     li.className = 'opp-item';
     li.innerHTML = `
       <div class="opp-left">
-        <div class="opp-dot" style="background:${x.color}"></div>
+        <div class="opp-dot" style="background:${x.catColor}"></div>
         <div>
-          <div class="opp-name">${esc(x.name)}</div>
-          <div class="opp-sub">${fmt(x.real)} ${x.meta > 0 ? 'de ' + fmt(x.meta) + ' orçados' : 'sem orçamento'}</div>
+          <div class="opp-name">${esc(x.subName)}</div>
+          <div class="opp-sub">${esc(x.catName)} · ${fmt(x.val)}</div>
         </div>
       </div>
-      <span class="badge ${cls}">${txt}</span>
+      <span class="badge badge-gray">${pct}% do total</span>
     `;
     list.appendChild(li);
   });
