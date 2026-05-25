@@ -593,6 +593,20 @@
     }
     .btn-ef-save:hover { background: #1e293b; }
 
+    /* ── TYPE PICKER ── */
+    .ef-type-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ef-type-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px;
+      background: white; cursor: pointer; font-family: inherit;
+      font-size: 13px; font-weight: 600; color: #1e293b;
+      transition: all 0.15s; min-width: 110px; flex: 1;
+    }
+    .ef-type-btn:hover { border-color: #38bdf8; background: #f0f9ff; color: #0284c7; }
+    .ef-type-icon { font-size: 26px; }
+    .tx-badge-receita { background: #f0fdf4; color: #15803d; }
+    .tx-badge-fatura  { background: #fdf4ff; color: #7c3aed; }
+
     .extrato-table-wrap {
       background: white; border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden;
@@ -672,10 +686,9 @@
       <div class="card-label">Receita do Mês</div>
       <div class="receita-wrap">
         <span>R$</span>
-        <input type="number" id="receitaInput" placeholder="0,00" step="0.01" min="0"
-          oninput="onReceitaInput(this.value)" onblur="saveData()">
+        <input type="number" id="receitaInput" placeholder="0,00" step="0.01" min="0" disabled>
       </div>
-      <div class="card-sub">clique para editar</div>
+      <div class="card-sub">da aba Lançamentos</div>
     </div>
     <div class="card">
       <div class="card-label">Total Gasto</div>
@@ -708,8 +721,7 @@
         <div class="recon-flabel">Fatura paga no mês</div>
         <div class="recon-finput-wrap">
           <span>R$</span>
-          <input type="number" id="faturaInput" placeholder="0,00" step="0.01" min="0"
-            oninput="onFaturaInput(this.value)" onblur="saveData()">
+          <input type="number" id="faturaInput" placeholder="0,00" step="0.01" min="0" disabled>
         </div>
       </div>
       <div class="recon-divider"></div>
@@ -755,46 +767,93 @@
       <div class="extrato-form-title">
         <span id="efFormTitle">Novo Lançamento</span>
       </div>
-      <div class="ef-fields">
-        <div class="ef-field">
-          <label>Data</label>
-          <input type="date" id="efData" class="ef-input">
+
+      <!-- Passo 1: escolha o tipo -->
+      <div id="efTypePicker">
+        <div class="ef-type-grid">
+          <button class="ef-type-btn" onclick="selectTxKind('despesa')">
+            <span class="ef-type-icon">💸</span>
+            <span>Despesa</span>
+          </button>
+          <button class="ef-type-btn" onclick="selectTxKind('receita')">
+            <span class="ef-type-icon">💰</span>
+            <span>Receita</span>
+          </button>
+          <button class="ef-type-btn" onclick="selectTxKind('fatura')">
+            <span class="ef-type-icon">💳</span>
+            <span>Pagamento de Fatura</span>
+          </button>
         </div>
-        <div class="ef-field">
-          <label>Competência</label>
-          <input type="month" id="efCompetencia" class="ef-input">
+        <div style="margin-top:14px">
+          <button class="btn-ef-cancel" onclick="cancelForm()">Cancelar</button>
         </div>
-        <div class="ef-field" style="min-width:160px">
-          <label>Categoria</label>
-          <select id="efCategoria" class="ef-input" onchange="onEfCategoriaChange()"></select>
-        </div>
-        <div class="ef-field" style="min-width:155px">
-          <label>Detalhamento</label>
-          <input type="text" id="efDet" class="ef-input" list="efDetList" placeholder="Ex: Combustível">
-          <datalist id="efDetList"></datalist>
-        </div>
-        <div class="ef-field ef-wide">
-          <label>Descrição (opcional)</label>
-          <input type="text" id="efDesc" class="ef-input" placeholder="Ex: Posto Shell">
-        </div>
-        <div class="ef-field">
-          <label>Valor (R$)</label>
-          <input type="number" id="efValor" class="ef-input" min="0" step="0.01" placeholder="0,00" style="width:120px">
-        </div>
-        <div class="ef-field">
-          <label>Tipo</label>
-          <div class="ef-tipo-wrap">
-            <button id="efTipoPix"  class="ef-tipo-btn active-pix"  onclick="setEfTipo('pix')">PIX/TED</button>
-            <button id="efTipoCard" class="ef-tipo-btn"              onclick="setEfTipo('card')">Crédito</button>
+      </div>
+
+      <!-- Passo 2a: campos de despesa -->
+      <div id="efFieldsDespesa" style="display:none">
+        <div class="ef-fields">
+          <div class="ef-field">
+            <label>Data</label>
+            <input type="date" id="efData" class="ef-input">
+          </div>
+          <div class="ef-field">
+            <label>Competência</label>
+            <input type="month" id="efCompetencia" class="ef-input">
+          </div>
+          <div class="ef-field" style="min-width:160px">
+            <label>Categoria</label>
+            <select id="efCategoria" class="ef-input" onchange="onEfCategoriaChange()"></select>
+          </div>
+          <div class="ef-field" style="min-width:155px">
+            <label>Detalhamento</label>
+            <input type="text" id="efDet" class="ef-input" list="efDetList" placeholder="Ex: Combustível">
+            <datalist id="efDetList"></datalist>
+          </div>
+          <div class="ef-field ef-wide">
+            <label>Descrição (opcional)</label>
+            <input type="text" id="efDesc" class="ef-input" placeholder="Ex: Posto Shell">
+          </div>
+          <div class="ef-field">
+            <label>Valor (R$)</label>
+            <input type="number" id="efValor" class="ef-input" min="0" step="0.01" placeholder="0,00" style="width:120px">
+          </div>
+          <div class="ef-field">
+            <label>Tipo</label>
+            <div class="ef-tipo-wrap">
+              <button id="efTipoPix"  class="ef-tipo-btn active-pix"  onclick="setEfTipo('pix')">PIX/TED</button>
+              <button id="efTipoCard" class="ef-tipo-btn"              onclick="setEfTipo('card')">Crédito</button>
+            </div>
+          </div>
+          <div class="ef-field">
+            <label>Parcelas</label>
+            <input type="number" id="efParcelas" class="ef-input" min="1" max="48" value="1" disabled style="width:75px">
+          </div>
+          <div class="ef-actions">
+            <button class="btn-ef-cancel" onclick="cancelForm()">Cancelar</button>
+            <button class="btn-ef-save"   onclick="saveTransaction()">Salvar</button>
           </div>
         </div>
-        <div class="ef-field">
-          <label>Parcelas</label>
-          <input type="number" id="efParcelas" class="ef-input" min="1" max="48" value="1" disabled style="width:75px">
-        </div>
-        <div class="ef-actions">
-          <button class="btn-ef-cancel" onclick="cancelForm()">Cancelar</button>
-          <button class="btn-ef-save"   onclick="saveTransaction()">Salvar</button>
+      </div>
+
+      <!-- Passo 2b: campos simples (receita / fatura) -->
+      <div id="efFieldsSimple" style="display:none">
+        <div class="ef-fields">
+          <div class="ef-field">
+            <label>Data</label>
+            <input type="date" id="efDataSimple" class="ef-input">
+          </div>
+          <div class="ef-field">
+            <label>Valor (R$)</label>
+            <input type="number" id="efValorSimple" class="ef-input" min="0" step="0.01" placeholder="0,00" style="width:130px">
+          </div>
+          <div class="ef-field ef-wide">
+            <label>Descrição (opcional)</label>
+            <input type="text" id="efDescSimple" class="ef-input" placeholder="Ex: Salário, Nubank...">
+          </div>
+          <div class="ef-actions">
+            <button class="btn-ef-cancel" onclick="cancelForm()">Cancelar</button>
+            <button class="btn-ef-save"   onclick="saveTransaction()">Salvar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1622,8 +1681,28 @@ function switchView(v, btn) {
 }
 
 // ─── EXTRATO ─────────────────────────────────────────────────────────────────
-let efEditId = null;
-let efTipo   = 'pix';
+let efEditId  = null;
+let efTipo    = 'pix';
+let efTxKind  = 'despesa';
+
+function showEfSection(section) {
+  document.getElementById('efTypePicker').style.display    = section === 'picker'  ? '' : 'none';
+  document.getElementById('efFieldsDespesa').style.display = section === 'despesa' ? '' : 'none';
+  document.getElementById('efFieldsSimple').style.display  = section === 'simple'  ? '' : 'none';
+}
+
+function selectTxKind(kind) {
+  efTxKind = kind;
+  const labels = { despesa: 'Nova Despesa', receita: 'Nova Receita', fatura: 'Pagamento de Fatura' };
+  document.getElementById('efFormTitle').textContent = labels[kind];
+  if (kind === 'despesa') {
+    showEfSection('despesa');
+    setTimeout(() => document.getElementById('efValor').focus(), 100);
+  } else {
+    showEfSection('simple');
+    setTimeout(() => document.getElementById('efValorSimple').focus(), 100);
+  }
+}
 
 function getTxs() {
   return allData().__transactions || [];
@@ -1671,9 +1750,27 @@ function recomputeRealized() {
   const all = allData();
   const txs = all.__transactions || [];
   const prevTouched = new Set(all.__txMonths || []);
-  const monthAgg = {};
+  const monthAgg    = {};
+  const monthReceita  = {};
+  const monthFatura   = {};
 
   txs.forEach(tx => {
+    const kind = tx.txKind || 'despesa';
+
+    if (kind === 'receita') {
+      const [y, m] = tx.data.split('-');
+      const mk = `${y}-${m}`;
+      monthReceita[mk] = (monthReceita[mk] || 0) + (+(tx.valor) || 0);
+      return;
+    }
+    if (kind === 'fatura') {
+      const [y, m] = tx.data.split('-');
+      const mk = `${y}-${m}`;
+      monthFatura[mk] = (monthFatura[mk] || 0) + (+(tx.valor) || 0);
+      return;
+    }
+
+    // despesa
     const [y, m] = tx.competencia.split('-').map(Number);
     const n = Math.max(1, +(tx.parcelas) || 1);
     const vlrParc = (+(tx.valor) || 0) / n;
@@ -1688,7 +1785,7 @@ function recomputeRealized() {
     }
   });
 
-  const newTouched = new Set(Object.keys(monthAgg));
+  const newTouched = new Set([...Object.keys(monthAgg), ...Object.keys(monthReceita), ...Object.keys(monthFatura)]);
   const allTouched = new Set([...prevTouched, ...newTouched]);
 
   allTouched.forEach(mk => {
@@ -1698,12 +1795,16 @@ function recomputeRealized() {
       ensureReconItem(all[mk]);
     }
 
+    // Apply receita and fatura from transactions
+    all[mk].receita      = Math.round((monthReceita[mk] || 0) * 100) / 100;
+    all[mk].faturaCartao = Math.round((monthFatura[mk]  || 0) * 100) / 100;
+
     // Zero non-recon realized
     all[mk].categories.forEach(cat =>
       cat.items.forEach(item => { if (!item.isRecon) { item.realPix = 0; item.realCard = 0; } })
     );
 
-    // Apply aggregated values
+    // Apply aggregated despesa values
     const agg = monthAgg[mk] || {};
     Object.values(agg).forEach(({ catId, det, pix, card }) => {
       const cat = all[mk].categories.find(c => c.id === catId);
@@ -1754,33 +1855,53 @@ function renderExtrato() {
   }
 
   txs.forEach(tx => {
-    const catName  = getCatName(tx.catId);
-    const catColor = getCatColor(tx.catId);
-    const n        = Math.max(1, +(tx.parcelas) || 1);
-
-    const row = document.createElement('div');
+    const kind = tx.txKind || 'despesa';
+    const row  = document.createElement('div');
     row.className = 'tx-row';
-    row.innerHTML = `
-      <div>${fmtDate(tx.data)}</div>
-      <div>${fmtMonthLabel(tx.competencia)}</div>
-      <div style="display:flex;align-items:center;gap:6px;overflow:hidden">
-        <div style="width:7px;height:7px;border-radius:50%;background:${catColor};flex-shrink:0"></div>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(catName)}</span>
-      </div>
-      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.det || '—')}</div>
-      <div style="color:#64748b;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.desc || '')}</div>
-      <div class="tx-val">${fmt(tx.valor || 0)}</div>
-      <div style="text-align:center">
-        <span class="tx-badge ${tx.tipo === 'card' ? 'tx-badge-card' : 'tx-badge-pix'}">
-          ${tx.tipo === 'card' ? 'Crédito' : 'PIX'}
-        </span>
-      </div>
-      <div class="tx-parc">${n > 1 ? n + 'x' : '1x'}</div>
-      <div class="tx-actions">
-        <button class="btn-tx-edit" onclick="openExtratoForm('${tx.id}')" title="Editar">✏</button>
-        <button class="btn-tx-del"  onclick="deleteTransaction('${tx.id}')" title="Excluir">✕</button>
-      </div>
-    `;
+
+    if (kind === 'receita' || kind === 'fatura') {
+      const badgeCls   = kind === 'receita' ? 'tx-badge-receita' : 'tx-badge-fatura';
+      const badgeLbl   = kind === 'receita' ? 'Receita' : 'Pag. Fatura';
+      const valColor   = kind === 'receita' ? '#15803d' : '#7c3aed';
+      const compLabel  = fmtMonthLabel(tx.competencia);
+      row.innerHTML = `
+        <div>${fmtDate(tx.data)}</div>
+        <div>${compLabel}</div>
+        <div style="grid-column:span 3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:12px">${esc(tx.desc || '—')}</div>
+        <div class="tx-val" style="color:${valColor}">${fmt(tx.valor || 0)}</div>
+        <div style="text-align:center"><span class="tx-badge ${badgeCls}">${badgeLbl}</span></div>
+        <div class="tx-parc">—</div>
+        <div class="tx-actions">
+          <button class="btn-tx-edit" onclick="openExtratoForm('${tx.id}')" title="Editar">✏</button>
+          <button class="btn-tx-del"  onclick="deleteTransaction('${tx.id}')" title="Excluir">✕</button>
+        </div>
+      `;
+    } else {
+      const catName  = getCatName(tx.catId);
+      const catColor = getCatColor(tx.catId);
+      const n        = Math.max(1, +(tx.parcelas) || 1);
+      row.innerHTML = `
+        <div>${fmtDate(tx.data)}</div>
+        <div>${fmtMonthLabel(tx.competencia)}</div>
+        <div style="display:flex;align-items:center;gap:6px;overflow:hidden">
+          <div style="width:7px;height:7px;border-radius:50%;background:${catColor};flex-shrink:0"></div>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(catName)}</span>
+        </div>
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.det || '—')}</div>
+        <div style="color:#64748b;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.desc || '')}</div>
+        <div class="tx-val">${fmt(tx.valor || 0)}</div>
+        <div style="text-align:center">
+          <span class="tx-badge ${tx.tipo === 'card' ? 'tx-badge-card' : 'tx-badge-pix'}">
+            ${tx.tipo === 'card' ? 'Crédito' : 'PIX'}
+          </span>
+        </div>
+        <div class="tx-parc">${n > 1 ? n + 'x' : '1x'}</div>
+        <div class="tx-actions">
+          <button class="btn-tx-edit" onclick="openExtratoForm('${tx.id}')" title="Editar">✏</button>
+          <button class="btn-tx-del"  onclick="deleteTransaction('${tx.id}')" title="Excluir">✕</button>
+        </div>
+      `;
+    }
     body.appendChild(row);
   });
 }
@@ -1797,42 +1918,59 @@ function openExtratoForm(editId) {
 
   const formCard = document.getElementById('efFormCard');
   formCard.style.display = 'block';
-  document.getElementById('efFormTitle').textContent = editId ? 'Editar Lançamento' : 'Novo Lançamento';
 
   if (editId) {
     const tx = getTxs().find(t => t.id === editId);
     if (!tx) return;
-    document.getElementById('efData').value        = tx.data || '';
-    document.getElementById('efCompetencia').value = tx.competencia || '';
-    document.getElementById('efCategoria').value   = tx.catId || '';
-    document.getElementById('efDet').value         = tx.det || '';
-    document.getElementById('efDesc').value        = tx.desc || '';
-    document.getElementById('efValor').value       = tx.valor || '';
-    document.getElementById('efParcelas').value    = tx.parcelas || 1;
-    setEfTipo(tx.tipo || 'pix');
+    efTxKind = tx.txKind || 'despesa';
+    const kind = efTxKind;
+    const labels = { despesa: 'Editar Despesa', receita: 'Editar Receita', fatura: 'Editar Fatura' };
+    document.getElementById('efFormTitle').textContent = labels[kind] || 'Editar Lançamento';
+
+    if (kind === 'despesa') {
+      showEfSection('despesa');
+      document.getElementById('efData').value        = tx.data || '';
+      document.getElementById('efCompetencia').value = tx.competencia || '';
+      document.getElementById('efCategoria').value   = tx.catId || '';
+      document.getElementById('efDet').value         = tx.det || '';
+      document.getElementById('efDesc').value        = tx.desc || '';
+      document.getElementById('efValor').value       = tx.valor || '';
+      document.getElementById('efParcelas').value    = tx.parcelas || 1;
+      setEfTipo(tx.tipo || 'pix');
+      onEfCategoriaChange();
+    } else {
+      showEfSection('simple');
+      document.getElementById('efDataSimple').value    = tx.data || '';
+      document.getElementById('efValorSimple').value   = tx.valor || '';
+      document.getElementById('efDescSimple').value    = tx.desc || '';
+    }
   } else {
-    const now     = new Date();
-    const todayS  = now.toISOString().split('T')[0];
-    const compS   = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    document.getElementById('efFormTitle').textContent = 'Novo Lançamento';
+    showEfSection('picker');
+    const now    = new Date();
+    const todayS = now.toISOString().split('T')[0];
+    const compS  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     document.getElementById('efData').value        = todayS;
     document.getElementById('efCompetencia').value = compS;
+    document.getElementById('efDataSimple').value  = todayS;
     const cats = (curData && curData.categories) || DEFAULT_CATS;
     document.getElementById('efCategoria').value   = cats[0]?.id || '';
     document.getElementById('efDet').value         = '';
     document.getElementById('efDesc').value        = '';
     document.getElementById('efValor').value       = '';
+    document.getElementById('efValorSimple').value = '';
+    document.getElementById('efDescSimple').value  = '';
     document.getElementById('efParcelas').value    = 1;
     setEfTipo('pix');
   }
 
-  onEfCategoriaChange();
   formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  setTimeout(() => document.getElementById('efValor').focus(), 100);
 }
 
 function cancelForm() {
   document.getElementById('efFormCard').style.display = 'none';
   efEditId = null;
+  efTxKind = 'despesa';
 }
 
 function setEfTipo(tipo) {
@@ -1860,31 +1998,44 @@ function onEfCategoriaChange() {
 }
 
 function saveTransaction() {
-  const data       = document.getElementById('efData').value;
-  const comp       = document.getElementById('efCompetencia').value;
-  const catId      = document.getElementById('efCategoria').value;
-  const det        = document.getElementById('efDet').value.trim();
-  const desc       = document.getElementById('efDesc').value.trim();
-  const valor      = parseFloat(document.getElementById('efValor').value) || 0;
-  const parcelas   = Math.max(1, parseInt(document.getElementById('efParcelas').value) || 1);
-
-  if (!data)       { alert('Informe a data.'); return; }
-  if (!comp)       { alert('Informe a competência.'); return; }
-  if (!catId)      { alert('Selecione a categoria.'); return; }
-  if (!det)        { alert('Informe o detalhamento.'); return; }
-  if (valor <= 0)  { alert('Informe um valor maior que zero.'); return; }
-
-  const txs = getTxs();
   const isEdit = !!efEditId;
+  const txs    = getTxs();
+  let newTx;
+
+  if (efTxKind === 'despesa') {
+    const data     = document.getElementById('efData').value;
+    const comp     = document.getElementById('efCompetencia').value;
+    const catId    = document.getElementById('efCategoria').value;
+    const det      = document.getElementById('efDet').value.trim();
+    const desc     = document.getElementById('efDesc').value.trim();
+    const valor    = parseFloat(document.getElementById('efValor').value) || 0;
+    const parcelas = Math.max(1, parseInt(document.getElementById('efParcelas').value) || 1);
+
+    if (!data)      { alert('Informe a data.'); return; }
+    if (!comp)      { alert('Informe a competência.'); return; }
+    if (!catId)     { alert('Selecione a categoria.'); return; }
+    if (!det)       { alert('Informe o detalhamento.'); return; }
+    if (valor <= 0) { alert('Informe um valor maior que zero.'); return; }
+
+    newTx = { data, competencia: comp, catId, det, desc, valor, tipo: efTipo, parcelas, txKind: 'despesa' };
+  } else {
+    const data  = document.getElementById('efDataSimple').value;
+    const valor = parseFloat(document.getElementById('efValorSimple').value) || 0;
+    const desc  = document.getElementById('efDescSimple').value.trim();
+
+    if (!data)      { alert('Informe a data.'); return; }
+    if (valor <= 0) { alert('Informe um valor maior que zero.'); return; }
+
+    const [y, m] = data.split('-');
+    const comp   = `${y}-${m}`;
+    newTx = { data, competencia: comp, desc, valor, txKind: efTxKind };
+  }
 
   if (isEdit) {
     const idx = txs.findIndex(t => t.id === efEditId);
-    if (idx >= 0) txs[idx] = { ...txs[idx], data, competencia: comp, catId, det, desc, valor, tipo: efTipo, parcelas };
+    if (idx >= 0) txs[idx] = { ...txs[idx], ...newTx };
   } else {
-    txs.push({
-      id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-      data, competencia: comp, catId, det, desc, valor, tipo: efTipo, parcelas,
-    });
+    txs.push({ id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2), ...newTx });
   }
 
   saveTxs(txs);
