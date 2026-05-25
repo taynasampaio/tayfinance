@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TayFinance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .logo { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { color: #38bdf8; }
+
+    .month-nav { display: flex; align-items: center; gap: 14px; }
+    .month-nav button {
+      background: rgba(255,255,255,0.08); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .month-nav button:hover { background: rgba(255,255,255,0.18); }
+    .month-label {
+      font-weight: 600; font-size: 15px;
+      min-width: 150px; text-align: center; text-transform: capitalize;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .tab-nav {
+      display: flex; background: rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 3px; gap: 2px;
+    }
+    .tab-btn {
+      padding: 5px 16px; border-radius: 6px; border: none;
+      background: transparent; color: rgba(255,255,255,0.6);
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .tab-btn.active { background: white; color: #0f172a; }
+    .btn-hdr {
+      background: rgba(255,255,255,0.08); border: none; color: white;
+      padding: 6px 13px; border-radius: 6px; cursor: pointer;
+      font-size: 12px; font-family: inherit; font-weight: 500;
+      transition: background 0.15s; display: flex; align-items: center; gap: 5px;
+    }
+    .btn-hdr:hover { background: rgba(255,255,255,0.18); }
+
+    /* ── MAIN ── */
+    main { max-width: 1340px; margin: 0 auto; padding: 24px; }
+
+    /* ── SUMMARY CARDS ── */
+    .summary-cards {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 16px;
+    }
+    .card {
+      background: white; border-radius: 12px; padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+    }
+    .card-label {
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px;
+    }
+    .card-value { font-size: 22px; font-weight: 700; color: #1e293b; }
+    .card-value.green { color: #10b981; }
+    .card-value.red   { color: #ef4444; }
+    .card-value.blue  { color: #3b82f6; }
+    .card-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    .receita-wrap { display: flex; align-items: center; gap: 5px; }
+    .receita-wrap span { font-size: 16px; font-weight: 600; color: #94a3b8; }
+    #receitaInput {
+      font-size: 20px; font-weight: 700; color: #10b981;
+      border: none; background: transparent; width: 170px;
+      font-family: inherit; outline: none;
+    }
+    #receitaInput:focus { border-bottom: 2px solid #10b981; }
+
+    /* ── RECONCILIATION BANNER ── */
+    .recon-banner {
+      background: white; border-radius: 12px; padding: 14px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .recon-lft { display: flex; align-items: center; gap: 12px; }
+    .recon-lft-icon { font-size: 22px; }
+    .recon-lft-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .recon-lft-sub   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    .recon-fields { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .recon-field  { display: flex; flex-direction: column; gap: 4px; }
+    .recon-flabel {
+      font-size: 10px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .recon-finput-wrap { display: flex; align-items: center; gap: 4px; }
+    .recon-finput-wrap span { font-size: 14px; font-weight: 600; color: #94a3b8; }
+    #faturaInput {
+      font-size: 18px; font-weight: 700; color: #1e293b;
+      border: none; background: transparent; width: 150px;
+      font-family: inherit; outline: none;
+      border-bottom: 1px solid transparent;
+    }
+    #faturaInput:focus { border-bottom-color: #38bdf8; }
+    .recon-fval { font-size: 17px; font-weight: 700; }
+    .recon-arrow { font-size: 18px; color: #cbd5e1; }
+    .recon-divider {
+      width: 1px; height: 36px; background: #e2e8f0; margin: 0 4px;
+    }
+
+    /* ── TABLE ── */
+    /* columns: categoria | detalhamento | meta | pix | crédito | total | diferença | % | del */
+    .tbl-head {
+      display: grid;
+      grid-template-columns: 195px 1fr 108px 105px 110px 115px 95px 55px 38px;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 10px 16px;
+    }
+    .tbl-head span {
+      font-size: 10.5px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .tbl-head span.r { text-align: right; }
+    .tbl-head span.c { text-align: center; }
+
+    .cat-row {
+      display: grid;
+      grid-template-columns: 195px 1fr 108px 105px 110px 115px 95px 55px 38px;
+      align-items: center;
+      padding: 10px 16px;
+      background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+      cursor: pointer; user-select: none; transition: background 0.12s;
+    }
+    .cat-row:hover { background: #f1f5f9; }
+
+    .cat-name-cell {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 13px; color: #334155;
+    }
+    .cat-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chevron { font-size: 9px; color: #94a3b8; margin-left: 4px; transition: transform 0.2s; }
+    .chevron.open { transform: rotate(180deg); }
+    .cat-num { font-size: 13px; font-weight: 600; text-align: right; padding-right: 6px; }
+
+    .det-row {
+      display: grid;
+      grid-template-columns: 195px 1fr 108px 105px 110px 115px 95px 55px 38px;
+      align-items: center;
+      padding: 7px 16px; border-bottom: 1px solid #f1f5f9;
+      transition: background 0.1s;
+    }
+    .det-row:hover { background: #fafafa; }
+    .det-row.is-recon { background: #fafafa; }
+
+    .name-input {
+      font-size: 13px; font-family: inherit; color: #475569;
+      background: transparent; border: 1px solid transparent;
+      border-radius: 5px; padding: 3px 7px; width: 100%;
+      outline: none; transition: all 0.15s;
+    }
+    .name-input:hover { border-color: #e2e8f0; }
+    .name-input:focus { border-color: #38bdf8; background: #f0f9ff; }
+
+    .money-input {
+      font-size: 13px; font-family: inherit; font-weight: 500;
+      color: #1e293b; background: transparent;
+      border: 1px solid transparent; border-radius: 5px;
+      padding: 3px 7px; width: 120px; text-align: right;
+      outline: none; transition: all 0.15s;
+    }
+    .money-input:hover { border-color: #e2e8f0; }
+    .money-input:focus { border-color: #38bdf8; background: #f0f9ff; }
+
+    .diff-cell { font-size: 13px; font-weight: 500; text-align: right; padding-right: 6px; }
+    .diff-pos { color: #10b981; }
+    .diff-neg { color: #ef4444; }
+    .diff-zer { color: #cbd5e1; }
+
+    .pct-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .pct-txt  { font-size: 11px; font-weight: 600; }
+    .pct-bar-bg { width: 48px; height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .pct-bar    { height: 100%; border-radius: 99px; transition: width 0.3s; }
+
+    .btn-del {
+      background: none; border: none; cursor: pointer;
+      color: #cbd5e1; font-size: 13px; padding: 4px; border-radius: 4px;
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-del:hover { color: #ef4444; background: #fef2f2; }
+
+    .btn-add-row {
+      background: none; border: none; cursor: pointer;
+      color: #38bdf8; font-size: 12px; font-family: inherit; font-weight: 500;
+      padding: 8px 16px 8px 230px;
+      text-align: left; width: 100%;
+      border-bottom: 1px solid #f1f5f9; transition: background 0.1s;
+    }
+    .btn-add-row:hover { background: #f0f9ff; }
+
+    .btn-new-cat {
+      background: none; border: none; cursor: pointer;
+      color: #64748b; font-size: 12px; font-family: inherit; font-weight: 600;
+      padding: 12px 16px; text-align: left; width: 100%;
+      border-top: 2px dashed #e2e8f0; transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-new-cat:hover { background: #f8fafc; color: #1e293b; border-top-color: #cbd5e1; }
+
+    .cat-name-input {
+      font-size: 13px; font-weight: 600; font-family: inherit; color: #334155;
+      background: transparent; border: 1px solid transparent;
+      border-radius: 5px; padding: 2px 6px;
+      outline: none; transition: all 0.15s; min-width: 120px;
+    }
+    .cat-name-input:hover { border-color: #e2e8f0; }
+    .cat-name-input:focus { border-color: #38bdf8; background: #f0f9ff; }
+
+    /* ── DRAG & DROP ── */
+    .drag-handle {
+      cursor: grab; color: #cbd5e1; font-size: 13px;
+      padding: 0 2px; flex-shrink: 0; opacity: 0;
+      transition: opacity 0.15s; user-select: none;
+      line-height: 1;
+    }
+    .cat-row:hover .drag-handle { opacity: 1; }
+    .drag-handle:active { cursor: grabbing; }
+    .cat-row.drag-over-top    { border-top: 2px solid #38bdf8 !important; }
+    .cat-row.drag-over-bottom { border-bottom: 2px solid #38bdf8 !important; }
+    .cat-row.dragging         { opacity: 0.4; }
+
+    /* ── COLOR PICKER ── */
+    .cat-dot { cursor: pointer; transition: transform 0.15s; }
+    .cat-dot:hover { transform: scale(1.4); }
+
+    .color-picker-popup {
+      position: fixed; z-index: 600;
+      background: white; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
+      display: none;
+    }
+    .color-picker-popup.open { display: block; }
+    .color-picker-title {
+      font-size: 10px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .color-swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .color-swatch {
+      width: 22px; height: 22px; border-radius: 50%;
+      cursor: pointer; border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .color-swatch:hover { transform: scale(1.25); }
+    .color-swatch.sel { border-color: #0f172a; }
+
+    /* ── PAYMENT TOGGLE ── */
+    .pay-wrap { display: flex; gap: 4px; justify-content: center; }
+    .pay-btn {
+      background: #f1f5f9; border: 1px solid #e2e8f0; color: #94a3b8;
+      cursor: pointer; font-size: 10.5px; font-family: inherit; font-weight: 600;
+      padding: 3px 6px; border-radius: 4px; transition: all 0.15s; line-height: 1.4;
+      white-space: nowrap;
+    }
+    .pay-btn:hover { border-color: #cbd5e1; color: #475569; }
+    .pay-btn.pay-card { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+    .pay-btn.pay-pix  { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+
+    /* recon auto-row */
+    .recon-item-name { font-size: 12px; font-style: italic; color: #94a3b8; padding: 3px 7px; }
+    .recon-item-val  { font-size: 13px; font-weight: 600; color: #94a3b8; text-align: right; padding-right: 6px; }
+    .recon-lock      { font-size: 11px; color: #cbd5e1; text-align: center; }
+
+    .table-wrap {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0; overflow: hidden;
+    }
+
+    /* ── DASHBOARD ── */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .chart-card {
+      background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+    }
+    .chart-card.full { grid-column: 1 / -1; }
+    .chart-title { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 16px; }
+    .chart-box { position: relative; height: 280px; }
+    .chart-box.tall { height: 320px; }
+
+    .opp-list { list-style: none; }
+    .opp-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .opp-item:last-child { border-bottom: none; }
+    .opp-left { display: flex; align-items: center; gap: 10px; }
+    .opp-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .opp-name { font-size: 13px; font-weight: 500; }
+    .opp-sub  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+    .badge-red   { background: #fef2f2; color: #ef4444; }
+    .badge-amber { background: #fffbeb; color: #d97706; }
+    .badge-green { background: #f0fdf4; color: #10b981; }
+    .badge-gray  { background: #f1f5f9; color: #64748b; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #0f172a; color: white;
+      padding: 11px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; z-index: 999;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.25s; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+    @media (max-width: 1080px) {
+      .summary-cards { grid-template-columns: repeat(2, 1fr); }
+      .dash-grid { grid-template-columns: 1fr; }
+      .tbl-head, .cat-row, .det-row {
+        grid-template-columns: 140px 1fr 88px 80px 85px 90px 72px 44px 30px;
+      }
+    }
+
+    /* ── MOBILE (≤768px) ── */
+    @media (max-width: 768px) {
+      /* Header: row1 = logo + month-nav, row2 = tabs + actions */
+      header {
+        height: auto;
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        row-gap: 8px;
+      }
+      .logo { flex: 1; font-size: 17px; }
+      .month-nav { order: 0; gap: 10px; }
+      .month-label { font-size: 13px; min-width: 120px; }
+      .header-right { flex: 0 0 100%; justify-content: space-between; order: 1; }
+      .tab-nav { flex: 1; }
+      .tab-btn { flex: 1; font-size: 12px; padding: 5px 4px; text-align: center; }
+      .btn-hdr { font-size: 11px; padding: 5px 9px; gap: 3px; }
+
+      main { padding: 12px; }
+
+      /* Cards */
+      .summary-cards { grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 12px; }
+      .card { padding: 14px 14px; }
+      .card-value { font-size: 17px; }
+      .card-label { font-size: 10px; }
+      #receitaInput { font-size: 17px; width: 120px; }
+
+      /* Recon banner */
+      .recon-banner { flex-direction: column; gap: 12px; padding: 14px 16px; }
+      .recon-fields { flex-wrap: wrap; gap: 12px; }
+      .recon-divider { display: none; }
+      .recon-arrow { display: none; }
+      .recon-field { flex: 1 1 calc(50% - 6px); }
+
+      /* Budget table: horizontal scroll */
+      .table-wrap { overflow-x: auto; }
+      .tbl-head { min-width: 680px; }
+      .cat-row, .det-row, .btn-add-row, .btn-new-cat { min-width: 680px; }
+
+      /* Extrato table: horizontal scroll */
+      .extrato-table-wrap { overflow-x: auto; }
+      .tx-head { min-width: 740px; }
+      .tx-row { min-width: 740px; }
+
+      /* Extrato form: 2 fields per row, then full-width */
+      .extrato-form-card { padding: 16px; }
+      .ef-fields { gap: 10px; }
+      .ef-field { flex: 1 1 calc(50% - 5px); min-width: calc(50% - 5px); }
+      .ef-field.ef-wide { flex: 1 1 100%; min-width: 100%; }
+      .ef-input { width: 100% !important; box-sizing: border-box; }
+      .ef-tipo-wrap { width: 100%; }
+      .ef-tipo-btn { flex: 1; }
+      .ef-actions { flex: 1 1 100%; justify-content: flex-end; }
+      .btn-ef-save, .btn-ef-cancel { flex: 1; justify-content: center; text-align: center; }
+
+      /* Dashboard */
+      .chart-box { height: 230px; }
+      .chart-box.tall { height: 260px; }
+      .chart-card { padding: 16px; }
+    }
+
+    /* ── SMALL PHONE (≤480px) ── */
+    @media (max-width: 480px) {
+      header { padding: 8px 12px; }
+      main { padding: 10px; }
+      .summary-cards { gap: 8px; }
+      .card { padding: 12px 12px; }
+      .card-value { font-size: 15px; }
+      .month-label { min-width: 100px; font-size: 12px; }
+      .tab-btn { font-size: 11px; padding: 5px 2px; }
+      .btn-hdr span.btn-txt { display: none; }
+      .recon-banner { padding: 12px; }
+      .ef-field { flex: 1 1 100%; min-width: 100%; }
+      .extrato-toolbar { margin-bottom: 10px; }
+      .btn-add-tx { font-size: 12px; padding: 7px 14px; }
+    }
+
+    /* ── SYNC MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+      z-index: 800; display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: white; border-radius: 16px; width: 100%; max-width: 680px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px; border-bottom: 1px solid #e2e8f0; position: sticky;
+      top: 0; background: white; z-index: 1; border-radius: 16px 16px 0 0;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .modal-subtitle { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .modal-close {
+      background: #f1f5f9; border: none; cursor: pointer;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; color: #475569;
+    }
+    .modal-close:hover { background: #e2e8f0; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+    .sync-step {
+      display: flex; gap: 14px;
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      background: #0f172a; color: white;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .step-desc  { font-size: 12px; color: #64748b; line-height: 1.6; margin-bottom: 8px; }
+
+    .cols-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 4px; }
+    .cols-table th {
+      background: #f8fafc; padding: 6px 10px; text-align: left;
+      font-weight: 600; color: #64748b; border: 1px solid #e2e8f0;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .cols-table td { padding: 6px 10px; border: 1px solid #e2e8f0; color: #475569; }
+    .cols-table tr:nth-child(even) td { background: #fafafa; }
+    .col-ex { color: #94a3b8; font-style: italic; }
+
+    .code-block {
+      background: #0f172a; border-radius: 8px; padding: 14px 16px;
+      font-family: 'Courier New', monospace; font-size: 11.5px;
+      color: #e2e8f0; overflow-x: auto; white-space: pre;
+      line-height: 1.55; max-height: 220px; overflow-y: auto;
+      position: relative;
+    }
+    .btn-copy {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(255,255,255,0.12); border: none; color: #e2e8f0;
+      padding: 4px 10px; border-radius: 5px; cursor: pointer;
+      font-size: 11px; font-family: inherit; font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-copy:hover { background: rgba(255,255,255,0.22); }
+    .code-wrap { position: relative; }
+
+    .deploy-steps { display: flex; flex-direction: column; gap: 6px; }
+    .deploy-step  {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 12px; color: #475569;
+    }
+    .deploy-step-n {
+      background: #f1f5f9; border-radius: 4px;
+      padding: 1px 6px; font-weight: 700; font-size: 11px;
+      color: #475569; flex-shrink: 0; margin-top: 1px;
+    }
+
+    .sync-url-row { display: flex; gap: 8px; align-items: center; }
+    #syncUrlInput {
+      flex: 1; padding: 9px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-family: inherit; font-size: 13px;
+      outline: none; color: #1e293b;
+    }
+    #syncUrlInput:focus { border-color: #38bdf8; }
+    .btn-sync {
+      background: #0f172a; color: white; border: none;
+      padding: 9px 18px; border-radius: 8px; cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .btn-sync:hover { background: #1e293b; }
+    .btn-sync:disabled { background: #94a3b8; cursor: not-allowed; }
+    .sync-status {
+      font-size: 11px; color: #94a3b8; margin-top: 6px;
+    }
+    .sync-status.ok  { color: #10b981; }
+    .sync-status.err { color: #ef4444; }
+
+    /* ── EXTRATO ── */
+    .extrato-toolbar {
+      display: flex; justify-content: flex-end; margin-bottom: 12px;
+    }
+    .btn-add-tx {
+      background: #0f172a; color: white; border: none;
+      padding: 8px 18px; border-radius: 7px; cursor: pointer;
+      font-size: 13px; font-family: inherit; font-weight: 600;
+      transition: background 0.15s; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-add-tx:hover { background: #1e293b; }
+
+    .extrato-form-card {
+      background: white; border-radius: 12px; padding: 20px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+    }
+    .extrato-form-title {
+      font-size: 14px; font-weight: 600; color: #1e293b;
+      margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .ef-fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .ef-field  { display: flex; flex-direction: column; gap: 5px; }
+    .ef-field.ef-wide { flex: 1; min-width: 180px; }
+    .ef-field label {
+      font-size: 10.5px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ef-input {
+      padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 7px;
+      font-family: inherit; font-size: 13px; color: #1e293b;
+      outline: none; transition: border-color 0.15s; background: white;
+    }
+    .ef-input:focus { border-color: #38bdf8; }
+    .ef-input:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+    .ef-tipo-wrap { display: flex; gap: 4px; }
+    .ef-tipo-btn {
+      padding: 7px 11px; border: 1px solid #e2e8f0; border-radius: 6px;
+      background: #f1f5f9; color: #94a3b8; cursor: pointer;
+      font-size: 12px; font-family: inherit; font-weight: 600; transition: all 0.15s;
+    }
+    .ef-tipo-btn.active-pix  { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+    .ef-tipo-btn.active-card { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+    .ef-actions { display: flex; gap: 8px; align-items: flex-end; }
+    .btn-ef-cancel {
+      padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 7px;
+      background: white; color: #64748b; cursor: pointer;
+      font-size: 13px; font-family: inherit; font-weight: 500; transition: all 0.15s;
+    }
+    .btn-ef-cancel:hover { background: #f8fafc; }
+    .btn-ef-save {
+      padding: 8px 20px; border: none; border-radius: 7px;
+      background: #0f172a; color: white; cursor: pointer;
+      font-size: 13px; font-family: inherit; font-weight: 600; transition: background 0.15s;
+    }
+    .btn-ef-save:hover { background: #1e293b; }
+
+    .extrato-table-wrap {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden;
+    }
+    .tx-head {
+      display: grid;
+      grid-template-columns: 90px 100px 150px 140px 1fr 115px 75px 65px 72px;
+      background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 10px 16px;
+    }
+    .tx-head span {
+      font-size: 10.5px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .tx-head span.r { text-align: right; }
+    .tx-head span.c { text-align: center; }
+    .tx-row {
+      display: grid;
+      grid-template-columns: 90px 100px 150px 140px 1fr 115px 75px 65px 72px;
+      align-items: center; padding: 9px 16px;
+      border-bottom: 1px solid #f1f5f9; transition: background 0.1s;
+      font-size: 13px; color: #475569;
+    }
+    .tx-row:hover { background: #fafafa; }
+    .tx-row:last-child { border-bottom: none; }
+    .tx-val { font-weight: 600; color: #1e293b; text-align: right; padding-right: 4px; }
+    .tx-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+    }
+    .tx-badge-pix  { background: #f0fdf4; color: #16a34a; }
+    .tx-badge-card { background: #eff6ff; color: #2563eb; }
+    .tx-parc { font-size: 11.5px; color: #94a3b8; text-align: center; }
+    .tx-actions { display: flex; gap: 4px; justify-content: center; }
+    .btn-tx-edit, .btn-tx-del {
+      background: none; border: none; cursor: pointer;
+      font-size: 13px; padding: 4px 6px; border-radius: 4px;
+      transition: all 0.15s; color: #cbd5e1;
+    }
+    .btn-tx-edit:hover { color: #38bdf8; background: #f0f9ff; }
+    .btn-tx-del:hover  { color: #ef4444; background: #fef2f2; }
+    .extrato-empty {
+      padding: 48px 24px; text-align: center; color: #94a3b8; font-size: 13px;
+    }
+    .extrato-empty p { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Tay<span>Finance</span></div>
+
+  <div class="month-nav">
+    <button onclick="changeMonth(-1)">&#8249;</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button onclick="changeMonth(1)">&#8250;</button>
+  </div>
+
+  <div class="header-right">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchView('lancamentos',this)">Orçamento</button>
+      <button class="tab-btn" onclick="switchView('extrato',this)">Lançamentos</button>
+      <button class="tab-btn" onclick="switchView('dashboard',this)">Dashboard</button>
+    </div>
+    <button class="btn-hdr" onclick="exportData()">&#8595; <span class="btn-txt">Exportar</span></button>
+    <label class="btn-hdr" style="cursor:pointer">
+      &#8593; <span class="btn-txt">Importar</span>
+      <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+    </label>
+  </div>
+</header>
+
+<main>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards" id="summaryCards">
+    <div class="card">
+      <div class="card-label">Receita do Mês</div>
+      <div class="receita-wrap">
+        <span>R$</span>
+        <input type="number" id="receitaInput" placeholder="0,00" step="0.01" min="0"
+          oninput="onReceitaInput(this.value)" onblur="saveData()">
+      </div>
+      <div class="card-sub">clique para editar</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Total Gasto</div>
+      <div class="card-value" id="cardGasto">R$ 0,00</div>
+      <div class="card-sub" id="cardGastoPct">—% da receita</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Saldo Disponível</div>
+      <div class="card-value" id="cardSaldo">R$ 0,00</div>
+      <div class="card-sub">receita − total gasto</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Taxa de Poupança</div>
+      <div class="card-value" id="cardPoupanca">—</div>
+      <div class="card-sub" id="cardPoupancaSub">meta ideal: 20%</div>
+    </div>
+  </div>
+
+  <!-- Credit Card Reconciliation Banner -->
+  <div class="recon-banner" id="reconBanner">
+    <div class="recon-lft">
+      <div class="recon-lft-icon">💳</div>
+      <div>
+        <div class="recon-lft-title">Reconciliação do Cartão de Crédito</div>
+        <div class="recon-lft-sub">A diferença entre a fatura e o que foi marcado como cartão vai automaticamente para Outros</div>
+      </div>
+    </div>
+    <div class="recon-fields">
+      <div class="recon-field">
+        <div class="recon-flabel">Fatura paga no mês</div>
+        <div class="recon-finput-wrap">
+          <span>R$</span>
+          <input type="number" id="faturaInput" placeholder="0,00" step="0.01" min="0"
+            oninput="onFaturaInput(this.value)" onblur="saveData()">
+        </div>
+      </div>
+      <div class="recon-divider"></div>
+      <div class="recon-field">
+        <div class="recon-flabel">Lançado como Cartão</div>
+        <div class="recon-fval" id="reconControle" style="color:#2563eb">R$ 0,00</div>
+      </div>
+      <div class="recon-arrow">→</div>
+      <div class="recon-field">
+        <div class="recon-flabel">Diferença → Outros</div>
+        <div class="recon-fval" id="reconDiff" style="color:#94a3b8">R$ 0,00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lançamentos -->
+  <div id="view-lancamentos" class="view active">
+    <div class="table-wrap">
+      <div class="tbl-head">
+        <span>Categoria</span>
+        <span>Detalhamento</span>
+        <span class="r">Meta (R$)</span>
+        <span class="r">PIX / TED</span>
+        <span class="r">Crédito</span>
+        <span class="r">Total</span>
+        <span class="r">Diferença</span>
+        <span class="c">%</span>
+        <span></span>
+      </div>
+      <div id="tableBody"></div>
+    </div>
+  </div>
+
+  <!-- Extrato -->
+  <div id="view-extrato" class="view">
+
+    <div class="extrato-toolbar">
+      <button class="btn-add-tx" onclick="openExtratoForm(null)">＋ Novo Lançamento</button>
+    </div>
+
+    <!-- Form card (hidden by default) -->
+    <div id="efFormCard" class="extrato-form-card" style="display:none">
+      <div class="extrato-form-title">
+        <span id="efFormTitle">Novo Lançamento</span>
+      </div>
+      <div class="ef-fields">
+        <div class="ef-field">
+          <label>Data</label>
+          <input type="date" id="efData" class="ef-input">
+        </div>
+        <div class="ef-field">
+          <label>Competência</label>
+          <input type="month" id="efCompetencia" class="ef-input">
+        </div>
+        <div class="ef-field" style="min-width:160px">
+          <label>Categoria</label>
+          <select id="efCategoria" class="ef-input" onchange="onEfCategoriaChange()"></select>
+        </div>
+        <div class="ef-field" style="min-width:155px">
+          <label>Detalhamento</label>
+          <input type="text" id="efDet" class="ef-input" list="efDetList" placeholder="Ex: Combustível">
+          <datalist id="efDetList"></datalist>
+        </div>
+        <div class="ef-field ef-wide">
+          <label>Descrição (opcional)</label>
+          <input type="text" id="efDesc" class="ef-input" placeholder="Ex: Posto Shell">
+        </div>
+        <div class="ef-field">
+          <label>Valor (R$)</label>
+          <input type="number" id="efValor" class="ef-input" min="0" step="0.01" placeholder="0,00" style="width:120px">
+        </div>
+        <div class="ef-field">
+          <label>Tipo</label>
+          <div class="ef-tipo-wrap">
+            <button id="efTipoPix"  class="ef-tipo-btn active-pix"  onclick="setEfTipo('pix')">PIX/TED</button>
+            <button id="efTipoCard" class="ef-tipo-btn"              onclick="setEfTipo('card')">Crédito</button>
+          </div>
+        </div>
+        <div class="ef-field">
+          <label>Parcelas</label>
+          <input type="number" id="efParcelas" class="ef-input" min="1" max="48" value="1" disabled style="width:75px">
+        </div>
+        <div class="ef-actions">
+          <button class="btn-ef-cancel" onclick="cancelForm()">Cancelar</button>
+          <button class="btn-ef-save"   onclick="saveTransaction()">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions table -->
+    <div class="extrato-table-wrap">
+      <div class="tx-head">
+        <span>Data</span>
+        <span>Competência</span>
+        <span>Categoria</span>
+        <span>Detalhamento</span>
+        <span>Descrição</span>
+        <span class="r">Valor</span>
+        <span class="c">Tipo</span>
+        <span class="c">Parcelas</span>
+        <span class="c">Ações</span>
+      </div>
+      <div id="txBody"></div>
+    </div>
+
+  </div>
+
+  <!-- Dashboard -->
+  <div id="view-dashboard" class="view">
+    <div class="dash-grid">
+
+      <div class="chart-card">
+        <div class="chart-title">Distribuição de Gastos por Categoria</div>
+        <div class="chart-box"><canvas id="chartDonut"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">Maiores Gastos &amp; Oportunidades</div>
+        <ul class="opp-list" id="oppList"></ul>
+      </div>
+
+      <div class="chart-card full">
+        <div class="chart-title">Meta vs Realizado por Categoria</div>
+        <div class="chart-box tall"><canvas id="chartBar"></canvas></div>
+      </div>
+
+      <div class="chart-card full">
+        <div class="chart-title">Histórico dos Últimos 6 Meses</div>
+        <div class="chart-box"><canvas id="chartLine"></canvas></div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ── SYNC MODAL ── -->
+<div class="modal-overlay hidden" id="syncModal" onclick="closeSyncOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Integrar com Google Planilhas</div>
+        <div class="modal-subtitle">Lance seus gastos na planilha e sincronize com 1 clique</div>
+      </div>
+      <button class="modal-close" onclick="closeSyncModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- STEP 1 -->
+      <div class="sync-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Crie a planilha no Google Sheets</div>
+          <div class="step-desc">Crie uma planilha nova e renomeie a aba para <strong>Gastos</strong>. Adicione os cabeçalhos na linha 1 exatamente como abaixo:</div>
+          <table class="cols-table">
+            <tr><th>Coluna</th><th>Nome</th><th>Exemplo</th></tr>
+            <tr><td>A</td><td>Data</td><td class="col-ex">15/05/2026</td></tr>
+            <tr><td>B</td><td>Categoria</td><td class="col-ex">Carro</td></tr>
+            <tr><td>C</td><td>Detalhamento</td><td class="col-ex">Combustível</td></tr>
+            <tr><td>D</td><td>Descrição</td><td class="col-ex">Posto Shell</td></tr>
+            <tr><td>E</td><td>Valor</td><td class="col-ex">250</td></tr>
+            <tr><td>F</td><td>Pagamento</td><td class="col-ex">Cartão ou PIX</td></tr>
+            <tr><td>G</td><td>Parcelas</td><td class="col-ex">3 (deixe 1 para à vista)</td></tr>
+          </table>
+          <div class="step-desc" style="margin-top:8px">Categorias aceitas: <em>Moradia, Mercado, Delivery, Restaurante / Bar / Rolê, Uber, Carro, Saúde, Lazer, Educação, Vestuário, Pessoal, Finanças, Outros</em></div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="sync-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Cole o código no Apps Script</div>
+          <div class="step-desc">Na planilha, vá em <strong>Extensões → Apps Script</strong>, apague o conteúdo existente e cole o código abaixo:</div>
+          <div class="code-wrap">
+            <div class="code-block" id="scriptCode"></div>
+            <button class="btn-copy" onclick="copyScript()">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="sync-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Publique como Web App</div>
+          <div class="deploy-steps">
+            <div class="deploy-step"><span class="deploy-step-n">a</span> Clique em <strong>Implantar → Nova implantação</strong></div>
+            <div class="deploy-step"><span class="deploy-step-n">b</span> Tipo: <strong>App da Web</strong></div>
+            <div class="deploy-step"><span class="deploy-step-n">c</span> Executar como: <strong>Eu</strong></div>
+            <div class="deploy-step"><span class="deploy-step-n">d</span> Quem tem acesso: <strong>Qualquer pessoa</strong></div>
+            <div class="deploy-step"><span class="deploy-step-n">e</span> Clique em <strong>Implantar</strong> e copie a URL gerada</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="sync-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Sincronize</div>
+          <div class="step-desc">Cole a URL do Web App e clique em Sincronizar. Os valores realizados serão atualizados com os dados da planilha.</div>
+          <div class="sync-url-row">
+            <input type="url" id="syncUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+            <button class="btn-sync" id="syncBtn" onclick="syncFromSheet()">Sincronizar</button>
+          </div>
+          <div class="sync-status" id="syncStatus"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="color-picker-popup" id="colorPicker">
+  <div class="color-picker-title">Cor da categoria</div>
+  <div class="color-swatches" id="colorSwatches"></div>
+</div>
+
+<script>
+// ─── CLOUD SYNC CONFIG ───────────────────────────────────────────────────────
+// Preencha após o deploy no Railway:
+const CLOUD_URL    = ''; // ex: 'https://tayfinance-api-production.up.railway.app'
+const CLOUD_SECRET = ''; // mesmo valor de API_SECRET configurado no Railway
+
+// ─── CATEGORY COLORS ────────────────────────────────────────────────────────
+const EXTRA_COLORS = ['#e11d48','#0891b2','#7c3aed','#b45309','#065f46','#be185d','#4d7c0f','#1d4ed8','#9f1239','#0e7490'];
+
+const CAT_COLORS = {
+  moradia:     '#6366f1',
+  mercado:     '#22c55e',
+  delivery:    '#f97316',
+  restaurante: '#ec4899',
+  uber:        '#334155',
+  carro:       '#78716c',
+  saude:       '#06b6d4',
+  lazer:       '#a855f7',
+  educacao:    '#3b82f6',
+  vestuario:   '#f43f5e',
+  pessoal:     '#84cc16',
+  financas:    '#eab308',
+  outros:      '#94a3b8',
+};
+
+// ─── DEFAULT CATEGORY STRUCTURE ─────────────────────────────────────────────
+const DEFAULT_CATS = [
+  { id: 'moradia',     name: 'Moradia',                  items: [
+    { id: 'mo1', det: 'Aluguel',            meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'mo2', det: 'Condomínio',         meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'mo3', det: 'Luz',                meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'mo4', det: 'Água',               meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'mo5', det: 'Internet',           meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'mo6', det: 'IPTU',               meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'mercado',     name: 'Mercado',                  items: [
+    { id: 'me1', det: 'Mercado',            meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'delivery',    name: 'Delivery',                 items: [
+    { id: 'de1', det: 'Delivery',           meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'restaurante', name: 'Restaurante / Bar / Rolê', items: [
+    { id: 're1', det: 'Restaurante / Bar / Rolê', meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'uber',        name: 'Uber',                     items: [
+    { id: 'ub1', det: 'Uber',               meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'carro',       name: 'Carro',                    items: [
+    { id: 'ca1', det: 'Parcela',            meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ca2', det: 'Combustível',        meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ca3', det: 'Manutenção',         meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ca4', det: 'Seguro',             meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ca5', det: 'Estacionamento',     meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'saude',       name: 'Saúde',                    items: [
+    { id: 'sa1', det: 'Plano de saúde',     meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'sa2', det: 'Farmácia',           meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'sa3', det: 'Consultas',          meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'lazer',       name: 'Lazer',                    items: [
+    { id: 'la1', det: 'Streaming',          meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'la2', det: 'Viagens',            meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'la3', det: 'Cinema / Shows',     meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'educacao',    name: 'Educação',                 items: [
+    { id: 'ed1', det: 'Cursos',             meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ed2', det: 'Livros',             meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'ed3', det: 'Assinaturas',        meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'vestuario',   name: 'Vestuário',                items: [
+    { id: 've1', det: 'Vestuário',          meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'pessoal',     name: 'Pessoal',                  items: [
+    { id: 'pe1', det: 'Academia',           meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'pe2', det: 'Salão',              meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'pe3', det: 'Cuidados pessoais',  meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'financas',    name: 'Finanças',                 items: [
+    { id: 'fi1', det: 'Investimentos',      meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: 'fi2', det: 'Seguro de vida',     meta: 0, realPix: 0, realCard: 0, isDef: true },
+  ]},
+  { id: 'outros',      name: 'Outros',                   items: [
+    { id: 'ou1',      det: 'Outros',                      meta: 0, realPix: 0, realCard: 0, isDef: true },
+    { id: '__recon__', det: 'Diferença fatura (cartão)',  meta: 0, realPix: 0, realCard: 0, isDef: true, isRecon: true },
+  ]},
+];
+
+const DEFAULT_CAT_IDS = new Set(DEFAULT_CATS.map(c => c.id));
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let curYear, curMonth;
+let curData = null;
+let expanded = new Set(DEFAULT_CATS.map(c => c.id));
+let charts = {};
+let dragSrcId = null;
+
+// ─── CLOUD SYNC ──────────────────────────────────────────────────────────────
+let _pushTimer = null;
+
+async function cloudLoad() {
+  if (!CLOUD_URL) return;
+  try {
+    const res = await fetch(CLOUD_URL + '/data', {
+      headers: { 'x-api-key': CLOUD_SECRET },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && Object.keys(data).length > 0) {
+      localStorage.setItem('tayfinance', JSON.stringify(data));
+    }
+  } catch { /* offline — continua com dados locais */ }
+}
+
+function cloudPush() {
+  if (!CLOUD_URL) return;
+  clearTimeout(_pushTimer);
+  _pushTimer = setTimeout(async () => {
+    try {
+      await fetch(CLOUD_URL + '/data', {
+        method: 'POST',
+        headers: { 'x-api-key': CLOUD_SECRET, 'Content-Type': 'application/json' },
+        body: localStorage.getItem('tayfinance') || '{}',
+      });
+    } catch { /* offline */ }
+  }, 1500);
+}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const now = new Date();
+  curYear = now.getFullYear();
+  curMonth = now.getMonth();
+  await cloudLoad();
+  render();
+});
+
+// ─── MONTH HELPERS ───────────────────────────────────────────────────────────
+function changeMonth(d) {
+  curMonth += d;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  render();
+}
+
+function monthKey(y, m) { return `${y}-${String(m + 1).padStart(2, '0')}`; }
+function curKey()  { return monthKey(curYear, curMonth); }
+function prevKey() { const d = new Date(curYear, curMonth - 1, 1); return monthKey(d.getFullYear(), d.getMonth()); }
+function monthLabel() {
+  return new Date(curYear, curMonth, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+}
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+function allData() { return JSON.parse(localStorage.getItem('tayfinance') || '{}'); }
+
+function loadMonthData() {
+  const all = allData();
+  const key = curKey();
+  if (!all[key]) {
+    const prev = all[prevKey()];
+    if (prev) {
+      const clone = JSON.parse(JSON.stringify(prev));
+      clone.receita = 0;
+      clone.faturaCartao = 0;
+      clone.categories.forEach(cat => cat.items.forEach(item => { item.realPix = 0; item.realCard = 0; }));
+      all[key] = clone;
+    } else {
+      all[key] = { receita: 0, faturaCartao: 0, categories: JSON.parse(JSON.stringify(DEFAULT_CATS)) };
+    }
+    localStorage.setItem('tayfinance', JSON.stringify(all));
+  }
+  // ensure faturaCartao field exists on older saved data
+  if (all[key].faturaCartao === undefined) all[key].faturaCartao = 0;
+  // migrate old items that use real/pay → realPix/realCard
+  all[key].categories.forEach(cat => cat.items.forEach(item => {
+    if (item.real !== undefined && item.realPix === undefined) {
+      if (item.pay === 'card') { item.realCard = item.real; item.realPix = 0; }
+      else                     { item.realPix  = item.real; item.realCard = 0; }
+      delete item.real; delete item.pay;
+    }
+    if (item.realPix  === undefined) item.realPix  = 0;
+    if (item.realCard === undefined) item.realCard = 0;
+  }));
+  // ensure __recon__ item exists in outros
+  ensureReconItem(all[key]);
+  return all[key];
+}
+
+function ensureReconItem(data) {
+  const outros = data.categories.find(c => c.id === 'outros');
+  if (outros && !outros.items.find(i => i.id === '__recon__')) {
+    outros.items.push({ id: '__recon__', det: 'Diferença fatura (cartão)', meta: 0, realPix: 0, realCard: 0, isDef: true, isRecon: true });
+  }
+}
+
+function saveData() {
+  if (!curData) return;
+  const all = allData();
+  all[curKey()] = curData;
+  localStorage.setItem('tayfinance', JSON.stringify(all));
+  cloudPush();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  curData = loadMonthData();
+  document.getElementById('monthLabel').textContent = monthLabel();
+  document.getElementById('receitaInput').value = curData.receita || '';
+  document.getElementById('faturaInput').value  = curData.faturaCartao || '';
+  calcRecon();
+  renderTable();
+  updateSummary();
+  if (document.getElementById('view-dashboard').classList.contains('active')) renderDashboard();
+}
+
+// ─── HELPERS — real total per item ───────────────────────────────────────────
+function iReal(item) { return (+item.realPix || 0) + (+item.realCard || 0); }
+
+// ─── RECONCILIATION ───────────────────────────────────────────────────────────
+function calcRecon() {
+  const fatura = +curData.faturaCartao || 0;
+
+  let totalCard = 0;
+  curData.categories.forEach(cat => {
+    cat.items.forEach(item => {
+      if (!item.isRecon) totalCard += (+item.realCard || 0);
+    });
+  });
+
+  const diff = Math.max(0, fatura - totalCard);
+
+  const outros = curData.categories.find(c => c.id === 'outros');
+  if (outros) {
+    const recon = outros.items.find(i => i.id === '__recon__');
+    if (recon) { recon.realCard = diff; recon.realPix = 0; recon.meta = diff; }
+  }
+
+  document.getElementById('reconControle').textContent = fmt(totalCard);
+  const diffEl = document.getElementById('reconDiff');
+  diffEl.textContent = fmt(diff);
+  diffEl.style.color = diff > 0 ? '#ef4444' : '#94a3b8';
+}
+
+// ─── TABLE ───────────────────────────────────────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('tableBody');
+  body.innerHTML = '';
+
+  curData.categories.forEach(cat => {
+    const isOpen = expanded.has(cat.id);
+    const sumMeta = cat.items.reduce((s, i) => s + (+i.meta || 0), 0);
+    const sumPix  = cat.items.reduce((s, i) => s + (+i.realPix  || 0), 0);
+    const sumCard = cat.items.reduce((s, i) => s + (+i.realCard || 0), 0);
+    const sumReal = sumPix + sumCard;
+    const diff  = sumMeta - sumReal;
+    const pct   = sumMeta > 0 ? Math.round(sumReal / sumMeta * 100) : null;
+    const color = cat.color || CAT_COLORS[cat.id] || '#94a3b8';
+
+    // ── Category header ──
+    const isDefCat = DEFAULT_CAT_IDS.has(cat.id);
+    const cRow = document.createElement('div');
+    cRow.className = 'cat-row';
+    cRow.onclick = () => toggleCat(cat.id);
+
+    const nameCell = isDefCat
+      ? `<span>${esc(cat.name)}</span>`
+      : `<input class="cat-name-input" value="${esc(cat.name)}"
+           oninput="setCatName('${cat.id}',this.value)"
+           onblur="saveData()" onclick="event.stopPropagation()">`;
+
+    const delCatBtn = !isDefCat
+      ? `<button class="btn-del" style="margin-left:auto"
+           onclick="deleteCat('${cat.id}',event)" title="Remover categoria">🗑</button>`
+      : '<div></div>';
+
+    cRow.draggable = true;
+    cRow.dataset.catId = cat.id;
+    cRow.innerHTML = `
+      <div class="cat-name-cell">
+        <span class="drag-handle" title="Arrastar para reordenar">⠿</span>
+        <div class="cat-dot" style="background:${color}"
+          onclick="openColorPicker('${cat.id}',event)" title="Mudar cor"></div>
+        ${nameCell}
+        <span class="chevron ${isOpen ? 'open' : ''}">▼</span>
+      </div>
+      <div></div>
+      <div class="cat-num" style="color:#64748b">${fmt(sumMeta)}</div>
+      <div class="cat-num" style="color:#16a34a">${sumPix  > 0 ? fmt(sumPix)  : '—'}</div>
+      <div class="cat-num" style="color:#2563eb">${sumCard > 0 ? fmt(sumCard) : '—'}</div>
+      <div class="cat-num">${fmt(sumReal)}</div>
+      <div class="diff-cell ${diffCls(diff)}">${diff !== 0 ? (diff > 0 ? '+' : '') + fmt(diff) : '—'}</div>
+      <div style="text-align:center;font-size:12px;font-weight:600;color:${pct !== null ? pctClr(pct) : '#cbd5e1'}">
+        ${pct !== null ? pct + '%' : '—'}
+      </div>
+      ${delCatBtn}
+    `;
+
+    cRow.addEventListener('dragstart', e => {
+      dragSrcId = cat.id;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => cRow.classList.add('dragging'), 0);
+    });
+    cRow.addEventListener('dragend', () => {
+      cRow.classList.remove('dragging');
+      document.querySelectorAll('.cat-row').forEach(r => {
+        r.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+      dragSrcId = null;
+    });
+    cRow.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (!dragSrcId || dragSrcId === cat.id) return;
+      document.querySelectorAll('.cat-row').forEach(r => {
+        r.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+      const rect = cRow.getBoundingClientRect();
+      const mid  = rect.top + rect.height / 2;
+      cRow.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    cRow.addEventListener('dragleave', () => {
+      cRow.classList.remove('drag-over-top', 'drag-over-bottom');
+    });
+    cRow.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!dragSrcId || dragSrcId === cat.id) return;
+      const cats   = curData.categories;
+      const srcIdx = cats.findIndex(c => c.id === dragSrcId);
+      const dstIdx = cats.findIndex(c => c.id === cat.id);
+      const rect   = cRow.getBoundingClientRect();
+      const mid    = rect.top + rect.height / 2;
+      const insertAfter = e.clientY >= mid;
+      const [moved] = cats.splice(srcIdx, 1);
+      const newDst  = cats.findIndex(c => c.id === cat.id);
+      cats.splice(insertAfter ? newDst + 1 : newDst, 0, moved);
+      saveData();
+      renderTable();
+    });
+
+    body.appendChild(cRow);
+
+    if (!isOpen) return;
+
+    // ── Detail rows ──
+    cat.items.forEach(item => {
+      const rPix  = +item.realPix  || 0;
+      const rCard = +item.realCard || 0;
+      const rTot  = rPix + rCard;
+      const d = (+item.meta || 0) - rTot;
+      const p = item.meta > 0 ? Math.round(rTot / item.meta * 100) : null;
+      const isRecon = !!item.isRecon;
+
+      const dRow = document.createElement('div');
+      dRow.className = 'det-row' + (isRecon ? ' is-recon' : '');
+
+      if (isRecon) {
+        dRow.innerHTML = `
+          <div></div>
+          <div><span class="recon-item-name">↳ ${esc(item.det)}</span></div>
+          <div></div>
+          <div></div>
+          <div class="recon-item-val" style="color:#2563eb">${rCard > 0 ? fmt(rCard) : '—'}</div>
+          <div class="recon-item-val">${rCard > 0 ? fmt(rCard) : '—'}</div>
+          <div class="diff-cell diff-zer">—</div>
+          <div class="recon-lock">🔒</div>
+          <div></div>
+        `;
+      } else {
+        dRow.innerHTML = `
+          <div></div>
+          <div>
+            <input class="name-input" value="${esc(item.det)}"
+              oninput="setDet('${cat.id}','${item.id}',this.value)"
+              onblur="saveData()" onclick="event.stopPropagation()">
+          </div>
+          <div style="text-align:right">
+            <input class="money-input" type="number" min="0" step="0.01"
+              value="${item.meta || ''}" placeholder="0,00"
+              oninput="setVal('${cat.id}','${item.id}','meta',this.value)"
+              onblur="saveData();renderTable();updateSummary()"
+              onclick="event.stopPropagation()">
+          </div>
+          <div style="text-align:right">
+            <input class="money-input" type="number" min="0" step="0.01"
+              value="${rPix || ''}" placeholder="0,00"
+              style="color:#16a34a"
+              oninput="setVal('${cat.id}','${item.id}','realPix',this.value)"
+              onblur="saveData();renderTable();updateSummary()"
+              onclick="event.stopPropagation()">
+          </div>
+          <div style="text-align:right">
+            <input class="money-input" type="number" min="0" step="0.01"
+              value="${rCard || ''}" placeholder="0,00"
+              style="color:#2563eb"
+              oninput="setVal('${cat.id}','${item.id}','realCard',this.value)"
+              onblur="saveData();renderTable();updateSummary()"
+              onclick="event.stopPropagation()">
+          </div>
+          <div style="text-align:right;padding-right:6px;font-size:13px;font-weight:600">
+            ${rTot > 0 ? fmt(rTot) : '<span style="color:#cbd5e1">—</span>'}
+          </div>
+          <div class="diff-cell ${diffCls(d)}">${d !== 0 ? (d > 0 ? '+' : '') + fmt(d) : '—'}</div>
+          <div class="pct-cell">
+            ${p !== null ? `
+              <span class="pct-txt" style="color:${pctClr(p)}">${p}%</span>
+              <div class="pct-bar-bg">
+                <div class="pct-bar" style="width:${Math.min(p,100)}%;background:${pctClr(p)}"></div>
+              </div>` : '<span style="color:#cbd5e1;font-size:11px">—</span>'}
+          </div>
+          <div>
+            ${!item.isDef
+              ? `<button class="btn-del" onclick="delItem('${cat.id}','${item.id}',event)" title="Remover">✕</button>`
+              : '<div style="width:34px"></div>'}
+          </div>
+        `;
+      }
+      body.appendChild(dRow);
+    });
+
+    // ── Add row button ──
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-row';
+    addBtn.textContent = '+ Adicionar linha';
+    addBtn.onclick = e => { e.stopPropagation(); addItem(cat.id); };
+    body.appendChild(addBtn);
+  });
+
+  // ── Nova categoria button ──
+  const newCatBtn = document.createElement('button');
+  newCatBtn.className = 'btn-new-cat';
+  newCatBtn.innerHTML = '＋ Nova categoria';
+  newCatBtn.onclick = () => addNewCategory();
+  body.appendChild(newCatBtn);
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function toggleCat(id) {
+  expanded.has(id) ? expanded.delete(id) : expanded.add(id);
+  renderTable();
+}
+
+function onReceitaInput(v) {
+  curData.receita = parseFloat(v) || 0;
+  updateSummary();
+}
+
+function onFaturaInput(v) {
+  curData.faturaCartao = parseFloat(v) || 0;
+  calcRecon();
+  updateSummary();
+  renderTable();
+}
+
+function setVal(catId, itemId, field, v) {
+  findItem(catId, itemId)[field] = parseFloat(v) || 0;
+  calcRecon();
+  updateSummary();
+}
+
+function setDet(catId, itemId, v) { findItem(catId, itemId).det = v; }
+
+function addItem(catId) {
+  const cat = curData.categories.find(c => c.id === catId);
+  cat.items.push({ id: 'c_' + Date.now(), det: 'Novo item', meta: 0, realPix: 0, realCard: 0, isDef: false });
+  saveData(); renderTable();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.name-input');
+    if (inputs.length) { const last = inputs[inputs.length - 1]; last.focus(); last.select(); }
+  }, 40);
+}
+
+function addNewCategory() {
+  const usedColors = new Set(curData.categories.map(c => c.color || CAT_COLORS[c.id] || '#94a3b8'));
+  const allPalette = [...Object.values(CAT_COLORS), ...EXTRA_COLORS];
+  const color = EXTRA_COLORS.find(c => !usedColors.has(c))
+    || allPalette.find(c => !usedColors.has(c))
+    || EXTRA_COLORS[curData.categories.length % EXTRA_COLORS.length];
+  const id = 'cat_' + Date.now();
+  curData.categories.push({
+    id, name: 'Nova Categoria', color,
+    items: [{ id: 'c_' + Date.now(), det: 'Novo item', meta: 0, realPix: 0, realCard: 0, isDef: false }],
+  });
+  expanded.add(id);
+  saveData(); renderTable();
+  // focus the new category name input
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.cat-name-input');
+    if (inputs.length) { const last = inputs[inputs.length - 1]; last.focus(); last.select(); }
+  }, 40);
+}
+
+function setCatName(catId, val) {
+  curData.categories.find(c => c.id === catId).name = val;
+}
+
+function deleteCat(catId, e) {
+  e.stopPropagation();
+  if (!confirm('Remover esta categoria e todos os seus itens?')) return;
+  curData.categories = curData.categories.filter(c => c.id !== catId);
+  expanded.delete(catId);
+  saveData(); calcRecon(); renderTable(); updateSummary();
+}
+
+function delItem(catId, itemId, e) {
+  e.stopPropagation();
+  const cat = curData.categories.find(c => c.id === catId);
+  cat.items = cat.items.filter(i => i.id !== itemId);
+  saveData(); calcRecon(); renderTable(); updateSummary();
+}
+
+function findItem(catId, itemId) {
+  return curData.categories.find(c => c.id === catId).items.find(i => i.id === itemId);
+}
+
+// ─── SUMMARY ─────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const receita   = +curData.receita || 0;
+  const totalReal = curData.categories.reduce((s, cat) =>
+    s + cat.items.reduce((ss, i) => ss + iReal(i), 0), 0);
+  const saldo   = receita - totalReal;
+  const taxaPct = receita > 0 ? (saldo / receita) * 100 : 0;
+
+  const gastoEl = document.getElementById('cardGasto');
+  gastoEl.textContent = fmt(totalReal);
+  gastoEl.className = 'card-value';
+
+  document.getElementById('cardGastoPct').textContent =
+    receita > 0 ? `${Math.round(totalReal / receita * 100)}% da receita` : '—% da receita';
+
+  const saldoEl = document.getElementById('cardSaldo');
+  saldoEl.textContent = fmt(saldo);
+  saldoEl.className = 'card-value ' + (saldo >= 0 ? 'green' : 'red');
+
+  const pEl  = document.getElementById('cardPoupanca');
+  const psEl = document.getElementById('cardPoupancaSub');
+  if (receita > 0) {
+    const pct = Math.round(taxaPct);
+    pEl.textContent = `${pct}%`;
+    pEl.className = 'card-value ' + (pct >= 20 ? 'green' : pct >= 10 ? 'blue' : 'red');
+    psEl.textContent = pct >= 20 ? 'Excelente! Meta atingida' :
+                       pct >= 10 ? 'Bom, mas meta é 20%' :
+                       saldo < 0 ? 'Atenção: gastou mais do que ganhou!' : 'Abaixo do ideal';
+  } else {
+    pEl.textContent = '—';
+    pEl.className = 'card-value';
+    psEl.textContent = 'informe a receita do mês';
+  }
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const cats  = curData.categories;
+  const names = cats.map(c => c.name);
+  const reals = cats.map(c => c.items.reduce((s, i) => s + iReal(i), 0));
+  const metas = cats.map(c => c.items.reduce((s, i) => s + (+i.meta || 0), 0));
+  const clrs  = cats.map(c => c.color || CAT_COLORS[c.id] || '#94a3b8');
+
+  const nz = reals.map((v, i) => v > 0 ? i : -1).filter(i => i >= 0);
+  destroyChart('donut');
+  charts.donut = new Chart(document.getElementById('chartDonut'), {
+    type: 'doughnut',
+    data: {
+      labels: nz.map(i => names[i]),
+      datasets: [{ data: nz.map(i => reals[i]), backgroundColor: nz.map(i => clrs[i]), borderWidth: 2, borderColor: '#fff' }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 11, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)}` } },
+      },
+    },
+  });
+
+  destroyChart('bar');
+  charts.bar = new Chart(document.getElementById('chartBar'), {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [
+        { label: 'Meta',      data: metas, backgroundColor: '#e2e8f0', borderRadius: 4 },
+        { label: 'Realizado', data: reals, backgroundColor: clrs,      borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'Inter', size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } },
+        y: { grid: { color: '#f8fafc' }, ticks: { font: { family: 'Inter', size: 11 }, callback: v => 'R$' + shortFmt(v) } },
+      },
+    },
+  });
+
+  const hist = last6Months();
+  destroyChart('line');
+  charts.line = new Chart(document.getElementById('chartLine'), {
+    type: 'line',
+    data: {
+      labels: hist.labels,
+      datasets: [
+        { label: 'Receita',     data: hist.receitas, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.06)', fill: true,  tension: 0.4, pointRadius: 5, pointBackgroundColor: '#10b981' },
+        { label: 'Total Gasto', data: hist.gastos,   borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.06)',  fill: false, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#ef4444' },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'Inter', size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } },
+        y: { grid: { color: '#f8fafc' }, ticks: { font: { family: 'Inter', size: 11 }, callback: v => 'R$' + shortFmt(v) } },
+      },
+    },
+  });
+
+  const list = document.getElementById('oppList');
+  list.innerHTML = '';
+
+  const ranked = cats.map((cat, i) => ({
+    name: cat.name, color: clrs[i],
+    meta: metas[i], real: reals[i],
+    pct: metas[i] > 0 ? reals[i] / metas[i] * 100 : (reals[i] > 0 ? Infinity : 0),
+  })).filter(x => x.real > 0).sort((a, b) => {
+    const aO = a.pct > 100, bO = b.pct > 100;
+    if (aO && !bO) return -1; if (!aO && bO) return 1;
+    if (aO && bO)  return (b.real - b.meta) - (a.real - a.meta);
+    return b.real - a.real;
+  });
+
+  if (!ranked.length) {
+    list.innerHTML = '<li style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">Nenhum gasto registrado ainda</li>';
+    return;
+  }
+
+  ranked.slice(0, 9).forEach(x => {
+    let txt, cls;
+    if (x.pct === Infinity)  { txt = 'Sem meta definida';           cls = 'badge-gray';  }
+    else if (x.pct > 100)    { txt = `+${fmt(x.real-x.meta)} acima`; cls = 'badge-red'; }
+    else if (x.pct > 80)     { txt = `${Math.round(x.pct)}% usado`; cls = 'badge-amber'; }
+    else                     { txt = `${Math.round(x.pct)}% usado`; cls = 'badge-green'; }
+
+    const li = document.createElement('li');
+    li.className = 'opp-item';
+    li.innerHTML = `
+      <div class="opp-left">
+        <div class="opp-dot" style="background:${x.color}"></div>
+        <div>
+          <div class="opp-name">${esc(x.name)}</div>
+          <div class="opp-sub">${fmt(x.real)} ${x.meta > 0 ? 'de ' + fmt(x.meta) + ' orçados' : 'sem orçamento'}</div>
+        </div>
+      </div>
+      <span class="badge ${cls}">${txt}</span>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function last6Months() {
+  const all = allData();
+  const labels = [], gastos = [], receitas = [];
+  for (let i = 5; i >= 0; i--) {
+    const d   = new Date(curYear, curMonth - i, 1);
+    const key = monthKey(d.getFullYear(), d.getMonth());
+    const lbl = d.toLocaleDateString('pt-BR', { month: 'short' });
+    labels.push(lbl.charAt(0).toUpperCase() + lbl.slice(1, 3));
+    const md = all[key];
+    if (md) {
+      gastos.push(md.categories.reduce((s, c) => s + c.items.reduce((ss, i) => ss + iReal(i), 0), 0));
+      receitas.push(md.receita || 0);
+    } else { gastos.push(0); receitas.push(0); }
+  }
+  return { labels, gastos, receitas };
+}
+
+// ─── VIEW SWITCH ─────────────────────────────────────────────────────────────
+function switchView(v, btn) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b  => b.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  btn.classList.add('active');
+  const isExtrato = v === 'extrato';
+  document.getElementById('summaryCards').style.display = isExtrato ? 'none' : '';
+  document.getElementById('reconBanner').style.display  = isExtrato ? 'none' : '';
+  if (v === 'dashboard') renderDashboard();
+  if (v === 'extrato')   renderExtrato();
+}
+
+// ─── EXTRATO ─────────────────────────────────────────────────────────────────
+let efEditId = null;
+let efTipo   = 'pix';
+
+function getTxs() {
+  return allData().__transactions || [];
+}
+
+function saveTxs(txs) {
+  const all = allData();
+  all.__transactions = txs;
+  localStorage.setItem('tayfinance', JSON.stringify(all));
+  cloudPush();
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+function fmtMonthLabel(ym) {
+  if (!ym) return '—';
+  const [y, m] = ym.split('-');
+  const d = new Date(+y, +m - 1, 1);
+  const lbl = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+  return lbl.charAt(0).toUpperCase() + lbl.slice(1);
+}
+
+function getCatName(catId) {
+  if (curData) {
+    const f = curData.categories.find(c => c.id === catId);
+    if (f) return f.name;
+  }
+  const def = DEFAULT_CATS.find(c => c.id === catId);
+  return def ? def.name : catId;
+}
+
+function getCatColor(catId) {
+  if (curData) {
+    const f = curData.categories.find(c => c.id === catId);
+    if (f) return f.color || CAT_COLORS[catId] || '#94a3b8';
+  }
+  return CAT_COLORS[catId] || '#94a3b8';
+}
+
+function recomputeRealized() {
+  const all = allData();
+  const txs = all.__transactions || [];
+  const prevTouched = new Set(all.__txMonths || []);
+  const monthAgg = {};
+
+  txs.forEach(tx => {
+    const [y, m] = tx.competencia.split('-').map(Number);
+    const n = Math.max(1, +(tx.parcelas) || 1);
+    const vlrParc = (+(tx.valor) || 0) / n;
+    for (let i = 0; i < n; i++) {
+      const d  = new Date(y, m - 1 + i, 1);
+      const mk = monthKey(d.getFullYear(), d.getMonth());
+      const ik = tx.catId + '||' + (tx.det || '').toLowerCase().trim();
+      if (!monthAgg[mk]) monthAgg[mk] = {};
+      if (!monthAgg[mk][ik]) monthAgg[mk][ik] = { catId: tx.catId, det: tx.det, pix: 0, card: 0 };
+      if (tx.tipo === 'card') monthAgg[mk][ik].card += vlrParc;
+      else                    monthAgg[mk][ik].pix  += vlrParc;
+    }
+  });
+
+  const newTouched = new Set(Object.keys(monthAgg));
+  const allTouched = new Set([...prevTouched, ...newTouched]);
+
+  allTouched.forEach(mk => {
+    if (!all[mk]) {
+      if (!newTouched.has(mk)) return;
+      all[mk] = { receita: 0, faturaCartao: 0, categories: JSON.parse(JSON.stringify(DEFAULT_CATS)) };
+      ensureReconItem(all[mk]);
+    }
+
+    // Zero non-recon realized
+    all[mk].categories.forEach(cat =>
+      cat.items.forEach(item => { if (!item.isRecon) { item.realPix = 0; item.realCard = 0; } })
+    );
+
+    // Apply aggregated values
+    const agg = monthAgg[mk] || {};
+    Object.values(agg).forEach(({ catId, det, pix, card }) => {
+      const cat = all[mk].categories.find(c => c.id === catId);
+      if (!cat) return;
+      let item = cat.items.find(i => !i.isRecon && i.det.toLowerCase().trim() === det.toLowerCase().trim());
+      if (!item) {
+        item = { id: 'txi_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                 det, meta: 0, realPix: 0, realCard: 0, isDef: false };
+        cat.items.push(item);
+      }
+      item.realPix  = Math.round(pix  * 100) / 100;
+      item.realCard = Math.round(card * 100) / 100;
+    });
+
+    // Recompute reconciliation
+    const fatura = all[mk].faturaCartao || 0;
+    let totalCard = 0;
+    all[mk].categories.forEach(cat =>
+      cat.items.forEach(i => { if (!i.isRecon) totalCard += +i.realCard || 0; })
+    );
+    const diff = Math.max(0, fatura - totalCard);
+    const outros = all[mk].categories.find(c => c.id === 'outros');
+    if (outros) {
+      const recon = outros.items.find(i => i.id === '__recon__');
+      if (recon) { recon.realCard = diff; recon.realPix = 0; recon.meta = diff; }
+    }
+  });
+
+  all.__txMonths = [...newTouched];
+  localStorage.setItem('tayfinance', JSON.stringify(all));
+}
+
+function renderExtrato() {
+  const txs = getTxs().slice().sort((a, b) => {
+    const dc = b.data.localeCompare(a.data);
+    return dc !== 0 ? dc : b.id.localeCompare(a.id);
+  });
+  const body = document.getElementById('txBody');
+  body.innerHTML = '';
+
+  if (!txs.length) {
+    body.innerHTML = `<div class="extrato-empty">
+      <div style="font-size:32px">📋</div>
+      <p>Nenhum lançamento ainda.</p>
+      <p>Clique em <strong>＋ Novo Lançamento</strong> para começar.</p>
+    </div>`;
+    return;
+  }
+
+  txs.forEach(tx => {
+    const catName  = getCatName(tx.catId);
+    const catColor = getCatColor(tx.catId);
+    const n        = Math.max(1, +(tx.parcelas) || 1);
+
+    const row = document.createElement('div');
+    row.className = 'tx-row';
+    row.innerHTML = `
+      <div>${fmtDate(tx.data)}</div>
+      <div>${fmtMonthLabel(tx.competencia)}</div>
+      <div style="display:flex;align-items:center;gap:6px;overflow:hidden">
+        <div style="width:7px;height:7px;border-radius:50%;background:${catColor};flex-shrink:0"></div>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(catName)}</span>
+      </div>
+      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.det || '—')}</div>
+      <div style="color:#64748b;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tx.desc || '')}</div>
+      <div class="tx-val">${fmt(tx.valor || 0)}</div>
+      <div style="text-align:center">
+        <span class="tx-badge ${tx.tipo === 'card' ? 'tx-badge-card' : 'tx-badge-pix'}">
+          ${tx.tipo === 'card' ? 'Crédito' : 'PIX'}
+        </span>
+      </div>
+      <div class="tx-parc">${n > 1 ? n + 'x' : '1x'}</div>
+      <div class="tx-actions">
+        <button class="btn-tx-edit" onclick="openExtratoForm('${tx.id}')" title="Editar">✏</button>
+        <button class="btn-tx-del"  onclick="deleteTransaction('${tx.id}')" title="Excluir">✕</button>
+      </div>
+    `;
+    body.appendChild(row);
+  });
+}
+
+function populateCatSelect() {
+  const sel  = document.getElementById('efCategoria');
+  const cats = (curData && curData.categories) || DEFAULT_CATS;
+  sel.innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+}
+
+function openExtratoForm(editId) {
+  efEditId = editId || null;
+  populateCatSelect();
+
+  const formCard = document.getElementById('efFormCard');
+  formCard.style.display = 'block';
+  document.getElementById('efFormTitle').textContent = editId ? 'Editar Lançamento' : 'Novo Lançamento';
+
+  if (editId) {
+    const tx = getTxs().find(t => t.id === editId);
+    if (!tx) return;
+    document.getElementById('efData').value        = tx.data || '';
+    document.getElementById('efCompetencia').value = tx.competencia || '';
+    document.getElementById('efCategoria').value   = tx.catId || '';
+    document.getElementById('efDet').value         = tx.det || '';
+    document.getElementById('efDesc').value        = tx.desc || '';
+    document.getElementById('efValor').value       = tx.valor || '';
+    document.getElementById('efParcelas').value    = tx.parcelas || 1;
+    setEfTipo(tx.tipo || 'pix');
+  } else {
+    const now     = new Date();
+    const todayS  = now.toISOString().split('T')[0];
+    const compS   = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    document.getElementById('efData').value        = todayS;
+    document.getElementById('efCompetencia').value = compS;
+    const cats = (curData && curData.categories) || DEFAULT_CATS;
+    document.getElementById('efCategoria').value   = cats[0]?.id || '';
+    document.getElementById('efDet').value         = '';
+    document.getElementById('efDesc').value        = '';
+    document.getElementById('efValor').value       = '';
+    document.getElementById('efParcelas').value    = 1;
+    setEfTipo('pix');
+  }
+
+  onEfCategoriaChange();
+  formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  setTimeout(() => document.getElementById('efValor').focus(), 100);
+}
+
+function cancelForm() {
+  document.getElementById('efFormCard').style.display = 'none';
+  efEditId = null;
+}
+
+function setEfTipo(tipo) {
+  efTipo = tipo;
+  document.getElementById('efTipoPix').className  = 'ef-tipo-btn' + (tipo === 'pix'  ? ' active-pix'  : '');
+  document.getElementById('efTipoCard').className = 'ef-tipo-btn' + (tipo === 'card' ? ' active-card' : '');
+  const parcEl = document.getElementById('efParcelas');
+  parcEl.disabled = tipo !== 'card';
+  if (tipo === 'pix') parcEl.value = 1;
+}
+
+function onEfCategoriaChange() {
+  const catId   = document.getElementById('efCategoria').value;
+  const cats    = (curData && curData.categories) || DEFAULT_CATS;
+  const cat     = cats.find(c => c.id === catId);
+  const datalist = document.getElementById('efDetList');
+  datalist.innerHTML = '';
+  if (cat) {
+    cat.items.filter(i => !i.isRecon).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.det;
+      datalist.appendChild(opt);
+    });
+  }
+}
+
+function saveTransaction() {
+  const data       = document.getElementById('efData').value;
+  const comp       = document.getElementById('efCompetencia').value;
+  const catId      = document.getElementById('efCategoria').value;
+  const det        = document.getElementById('efDet').value.trim();
+  const desc       = document.getElementById('efDesc').value.trim();
+  const valor      = parseFloat(document.getElementById('efValor').value) || 0;
+  const parcelas   = Math.max(1, parseInt(document.getElementById('efParcelas').value) || 1);
+
+  if (!data)       { alert('Informe a data.'); return; }
+  if (!comp)       { alert('Informe a competência.'); return; }
+  if (!catId)      { alert('Selecione a categoria.'); return; }
+  if (!det)        { alert('Informe o detalhamento.'); return; }
+  if (valor <= 0)  { alert('Informe um valor maior que zero.'); return; }
+
+  const txs = getTxs();
+  const isEdit = !!efEditId;
+
+  if (isEdit) {
+    const idx = txs.findIndex(t => t.id === efEditId);
+    if (idx >= 0) txs[idx] = { ...txs[idx], data, competencia: comp, catId, det, desc, valor, tipo: efTipo, parcelas };
+  } else {
+    txs.push({
+      id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+      data, competencia: comp, catId, det, desc, valor, tipo: efTipo, parcelas,
+    });
+  }
+
+  saveTxs(txs);
+  recomputeRealized();
+  cancelForm();
+  renderExtrato();
+  render();
+  toast(isEdit ? 'Lançamento atualizado!' : 'Lançamento salvo!');
+}
+
+function deleteTransaction(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  saveTxs(getTxs().filter(t => t.id !== id));
+  recomputeRealized();
+  renderExtrato();
+  render();
+  toast('Lançamento excluído.');
+}
+
+// ─── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(allData(), null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `tayfinance_backup_${curKey()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup exportado com sucesso!');
+}
+
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      localStorage.setItem('tayfinance', JSON.stringify(JSON.parse(ev.target.result)));
+      render(); toast('Dados importados com sucesso!');
+    } catch { toast('Erro: arquivo inválido.'); }
+  };
+  reader.readAsText(file); e.target.value = '';
+}
+
+// ─── SYNC MODAL ──────────────────────────────────────────────────────────────
+const APPS_SCRIPT_CODE = `// ═══════════════════════════════════════════════════════
+//  TayFinance — Google Apps Script
+//  Cole este código e publique como Web App:
+//  Executar como: Eu  |  Quem tem acesso: Qualquer pessoa
+// ═══════════════════════════════════════════════════════
+
+const CATEGORIA_ID = {
+  'Moradia':                  'moradia',
+  'Mercado':                  'mercado',
+  'Delivery':                 'delivery',
+  'Restaurante / Bar / Rolê': 'restaurante',
+  'Uber':                     'uber',
+  'Carro':                    'carro',
+  'Saúde':                    'saude',
+  'Lazer':                    'lazer',
+  'Educação':                 'educacao',
+  'Vestuário':                'vestuario',
+  'Pessoal':                  'pessoal',
+  'Finanças':                 'financas',
+  'Outros':                   'outros',
+};
+
+function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+                  .getSheetByName('Gastos');
+  if (!sheet) return resp({ erro: 'Aba "Gastos" não encontrada' });
+
+  const rows = sheet.getDataRange().getValues();
+  const result = {};
+
+  for (let i = 1; i < rows.length; i++) {
+    const [data, categoria, detalhamento,
+           descricao, valor, pagamento, parcelas] = rows[i];
+    if (!data || !categoria || !valor) continue;
+
+    const date = new Date(data);
+    if (isNaN(date.getTime())) continue;
+
+    const catId     = CATEGORIA_ID[String(categoria).trim()] || 'outros';
+    const det       = String(detalhamento || categoria).trim();
+    const vlr       = parseFloat(String(valor).replace(',', '.')) || 0;
+    const pay       = String(pagamento || '').toLowerCase()
+                        .includes('cart') ? 'card' : 'pix';
+    const nParc     = Math.max(1, parseInt(parcelas) || 1);
+    const vlrParc   = Math.round((vlr / nParc) * 100) / 100;
+
+    for (let p = 0; p < nParc; p++) {
+      const d   = new Date(date.getFullYear(), date.getMonth() + p, 1);
+      const key = d.getFullYear() + '-' +
+                  String(d.getMonth() + 1).padStart(2, '0');
+      if (!result[key]) result[key] = [];
+      result[key].push({
+        catId, det, vlr: vlrParc, pay,
+        parcela: p + 1, totalParc: nParc
+      });
+    }
+  }
+
+  return resp(result);
+}
+
+function resp(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+const SHEET_CAT_IDS = new Set([
+  'moradia','mercado','delivery','restaurante','uber','carro',
+  'saude','lazer','educacao','vestuario','pessoal','financas','outros',
+]);
+
+function openSyncModal() {
+  document.getElementById('scriptCode').textContent = APPS_SCRIPT_CODE;
+  const meta = (allData().__syncMeta) || {};
+  if (meta.url) document.getElementById('syncUrlInput').value = meta.url;
+  if (meta.lastSync) {
+    const d = new Date(meta.lastSync);
+    setSyncStatus('ok', `Última sincronização: ${d.toLocaleString('pt-BR')}`);
+  }
+  document.getElementById('syncModal').classList.remove('hidden');
+}
+
+function closeSyncModal() {
+  document.getElementById('syncModal').classList.add('hidden');
+}
+
+function closeSyncOnOverlay(e) {
+  if (e.target === document.getElementById('syncModal')) closeSyncModal();
+}
+
+function copyScript() {
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+
+async function syncFromSheet() {
+  const url = document.getElementById('syncUrlInput').value.trim();
+  if (!url) { setSyncStatus('err', 'Cole a URL do Web App primeiro.'); return; }
+
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true; btn.textContent = 'Sincronizando…';
+  setSyncStatus('', 'Buscando dados…');
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const sheetData = await res.json();
+
+    if (sheetData.erro) throw new Error(sheetData.erro);
+
+    const all = allData();
+
+    Object.entries(sheetData).forEach(([monthKey, items]) => {
+      // Garante que o mês existe
+      if (!all[monthKey]) {
+        all[monthKey] = {
+          receita: 0, faturaCartao: 0,
+          categories: JSON.parse(JSON.stringify(DEFAULT_CATS)),
+        };
+        ensureReconItem(all[monthKey]);
+      }
+
+      // Zera todos os realizados deste mês (exceto recon) — planilha é a fonte
+      all[monthKey].categories.forEach(cat =>
+        cat.items.forEach(item => { if (!item.isRecon) { item.realPix = 0; item.realCard = 0; } })
+      );
+
+      // Agrega por catId + detalhamento
+      const agg = {};
+      items.forEach(({ catId, det, vlr, pay }) => {
+        const k = catId + '||' + det.toLowerCase();
+        if (!agg[k]) agg[k] = { catId, det, vlr: 0, pay };
+        agg[k].vlr += vlr;
+        if (pay === 'card') agg[k].pay = 'card'; // cartão tem prioridade
+      });
+
+      Object.values(agg).forEach(({ catId, det, vlr, pay }) => {
+        let cat = all[monthKey].categories.find(c => c.id === catId);
+        if (!cat) {
+          // Categoria customizada criada na planilha — adiciona dinamicamente
+          cat = { id: catId, name: det, color: EXTRA_COLORS[0], items: [] };
+          all[monthKey].categories.push(cat);
+        }
+
+        let item = cat.items.find(i =>
+          !i.isRecon && i.det.toLowerCase() === det.toLowerCase()
+        );
+        if (!item) {
+          item = { id: 'sync_' + catId + '_' + Date.now() + Math.random(),
+                   det, meta: 0, real: 0, pay: null, isDef: false };
+          cat.items.push(item);
+        }
+        if (pay === 'card') item.realCard = (item.realCard || 0) + vlr;
+        else                item.realPix  = (item.realPix  || 0) + vlr;
+      });
+
+      // Recalcula reconciliação do cartão para o mês
+      const fatura = all[monthKey].faturaCartao || 0;
+      let totalCard = 0;
+      all[monthKey].categories.forEach(cat =>
+        cat.items.forEach(i => { if (!i.isRecon) totalCard += +i.realCard || 0; })
+      );
+      const diff = Math.max(0, fatura - totalCard);
+      const outros = all[monthKey].categories.find(c => c.id === 'outros');
+      if (outros) {
+        const recon = outros.items.find(i => i.id === '__recon__');
+        if (recon) { recon.realCard = diff; recon.realPix = 0; recon.meta = diff; }
+      }
+    });
+
+    // Salva URL e timestamp
+    all.__syncMeta = { url, lastSync: new Date().toISOString() };
+    localStorage.setItem('tayfinance', JSON.stringify(all));
+
+    const count = Object.keys(sheetData).length;
+    setSyncStatus('ok', `✓ ${count} mês(es) sincronizado(s) — ${new Date().toLocaleString('pt-BR')}`);
+    render();
+    toast('Planilha sincronizada!');
+  } catch (err) {
+    setSyncStatus('err', `Erro: ${err.message}. Verifique a URL e as permissões do Web App.`);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sincronizar';
+  }
+}
+
+function setSyncStatus(type, msg) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = msg;
+  el.className = 'sync-status' + (type ? ' ' + type : '');
+}
+
+// ─── COLOR PICKER ────────────────────────────────────────────────────────────
+const ALL_PALETTE = [
+  '#6366f1','#3b82f6','#0891b2','#06b6d4','#22c55e',
+  '#84cc16','#eab308','#f97316','#f43f5e','#ec4899',
+  '#a855f7','#7c3aed','#334155','#78716c','#94a3b8',
+  '#e11d48','#be185d','#b45309','#065f46','#4d7c0f',
+];
+
+function openColorPicker(catId, e) {
+  e.stopPropagation();
+  const cat   = curData.categories.find(c => c.id === catId);
+  const curClr = cat.color || CAT_COLORS[catId] || '#94a3b8';
+
+  const swatches = document.getElementById('colorSwatches');
+  swatches.innerHTML = '';
+  ALL_PALETTE.forEach(clr => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (clr === curClr ? ' sel' : '');
+    sw.style.background = clr;
+    sw.title = clr;
+    sw.onclick = ev => { ev.stopPropagation(); setCatColor(catId, clr); };
+    swatches.appendChild(sw);
+  });
+
+  const picker = document.getElementById('colorPicker');
+  const rect   = e.target.getBoundingClientRect();
+  picker.style.top  = (rect.bottom + 6) + 'px';
+  picker.style.left = Math.min(rect.left, window.innerWidth - 160) + 'px';
+  picker.classList.add('open');
+}
+
+function setCatColor(catId, color) {
+  curData.categories.find(c => c.id === catId).color = color;
+  document.getElementById('colorPicker').classList.remove('open');
+  saveData();
+  renderTable();
+  if (document.getElementById('view-dashboard').classList.contains('active')) renderDashboard();
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('colorPicker')?.classList.remove('open');
+});
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function fmt(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
+function shortFmt(v) { return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(Math.round(v)); }
+function diffCls(d) { return d > 0 ? 'diff-pos' : d < 0 ? 'diff-neg' : 'diff-zer'; }
+function pctClr(p)  { return p > 100 ? '#ef4444' : p > 80 ? '#f59e0b' : '#10b981'; }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function destroyChart(k) { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
