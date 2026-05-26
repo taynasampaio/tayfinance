@@ -651,6 +651,34 @@
       padding: 48px 24px; text-align: center; color: #94a3b8; font-size: 13px;
     }
     .extrato-empty p { margin-top: 8px; }
+
+    /* ── PATRIMÔNIO ── */
+    .patrimonio-section { margin-bottom: 18px; }
+    .patrimonio-cards {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    }
+    .patr-card {
+      background: white; border-radius: 12px; padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+    }
+    .patr-icon { font-size: 22px; margin-bottom: 8px; }
+    .patr-label {
+      font-size: 11px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px;
+    }
+    .patr-input-wrap { display: flex; align-items: center; gap: 5px; }
+    .patr-input-wrap > span { font-size: 16px; font-weight: 600; color: #94a3b8; }
+    .patr-input {
+      font-size: 20px; font-weight: 700;
+      border: none; background: transparent; width: 160px;
+      font-family: inherit; outline: none;
+      border-bottom: 1px solid transparent; transition: border-color 0.15s;
+    }
+    .patr-input:focus { border-bottom-color: #38bdf8; }
+    .patr-total-val { font-size: 22px; font-weight: 700; color: #6366f1; }
+    .patr-sub { font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
+    @media (max-width: 1080px) { .patrimonio-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px)  { .patrimonio-cards { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -878,6 +906,12 @@
 
   <!-- Dashboard -->
   <div id="view-dashboard" class="view">
+
+    <!-- Patrimônio Investido -->
+    <div class="patrimonio-section">
+      <div class="patrimonio-cards" id="patrimonioCards"></div>
+    </div>
+
     <div class="dash-grid">
 
       <div class="chart-card">
@@ -1526,8 +1560,72 @@ function updateSummary() {
   }
 }
 
+// ─── PATRIMÔNIO ──────────────────────────────────────────────────────────────
+const PATR_BUCKETS = [
+  { key: 'caixinha', icon: '🏦', label: 'Caixinha / Poupança', color: '#10b981' },
+  { key: 'acoes',    icon: '📈', label: 'Ações',               color: '#3b82f6' },
+  { key: 'bolsaUs',  icon: '🌎', label: 'Bolsa Americana',     color: '#8b5cf6' },
+];
+
+function loadPatrimonio() {
+  return allData().__patrimonio || { caixinha: 0, acoes: 0, bolsaUs: 0 };
+}
+
+function savePatrimonio(key, val) {
+  const all = allData();
+  if (!all.__patrimonio) all.__patrimonio = { caixinha: 0, acoes: 0, bolsaUs: 0 };
+  all.__patrimonio[key] = parseFloat(val) || 0;
+  localStorage.setItem('tayfinance', JSON.stringify(all));
+  cloudPush();
+  updatePatrimonioTotal();
+}
+
+function updatePatrimonioTotal() {
+  const p = loadPatrimonio();
+  const total = PATR_BUCKETS.reduce((s, b) => s + (p[b.key] || 0), 0);
+  const el  = document.getElementById('patrimonioTotal');
+  const sub = document.getElementById('patrimonioSub');
+  if (el)  el.textContent  = fmt(total);
+  if (sub) sub.innerHTML   = patrimonioSubText(p, total);
+}
+
+function patrimonioSubText(p, total) {
+  if (total <= 0) return 'nenhum investimento registrado';
+  return PATR_BUCKETS
+    .filter(b => p[b.key] > 0)
+    .map(b => `<span style="color:${b.color};font-weight:600">${b.label.split(' ')[0]}</span> ${Math.round(p[b.key] / total * 100)}%`)
+    .join(' &nbsp;·&nbsp; ');
+}
+
+function renderPatrimonio() {
+  const p     = loadPatrimonio();
+  const total = PATR_BUCKETS.reduce((s, b) => s + (p[b.key] || 0), 0);
+  const c     = document.getElementById('patrimonioCards');
+  if (!c) return;
+  c.innerHTML = PATR_BUCKETS.map(b => `
+    <div class="patr-card">
+      <div class="patr-icon">${b.icon}</div>
+      <div class="patr-label">${b.label}</div>
+      <div class="patr-input-wrap">
+        <span>R$</span>
+        <input type="number" class="patr-input" style="color:${b.color}"
+          value="${p[b.key] || ''}" placeholder="0,00" step="0.01" min="0"
+          oninput="savePatrimonio('${b.key}', this.value)">
+      </div>
+    </div>
+  `).join('') + `
+    <div class="patr-card">
+      <div class="patr-icon">💰</div>
+      <div class="patr-label">Total Investido</div>
+      <div class="patr-total-val" id="patrimonioTotal">${fmt(total)}</div>
+      <div class="patr-sub" id="patrimonioSub">${patrimonioSubText(p, total)}</div>
+    </div>
+  `;
+}
+
 // ─── DASHBOARD ───────────────────────────────────────────────────────────────
 function renderDashboard() {
+  renderPatrimonio();
   const cats  = curData.categories;
   const names = cats.map(c => c.name);
   const reals = cats.map(c => c.items.reduce((s, i) => s + iReal(i), 0));
